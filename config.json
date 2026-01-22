@@ -1,0 +1,77 @@
+{
+  "brand": {
+    "name": "João Motorista Particular",
+    "city": "Lages/SC",
+    "whatsappE164": "5549984094010",
+    "whatsappDisplay": "(49) 9 8409-4010"
+  },
+  "pricing": {
+    "currency": "BRL",
+    "pricePerKm": 2.95,
+    "baseFare": 6.0,
+    "minFare": 18.0,
+    "rounding": {
+      "mode": "ceil",
+      "step": 1.0
+    },
+    "monthly": {
+      "discountPercent": 8,
+      "anticipationPercent": 50
+    }
+  },
+  "service": {
+    "coverageText": "Atendimento dentro de Lages/SC.",
+    "schedule": [
+      { "day": "Segunda", "hours": "05h às 08h / 12h às 13h30 / 17h30 às 23h" },
+      { "day": "Terça", "hours": "05h às 08h / 12h às 13h30 / 17h30 às 23h" },
+      { "day": "Quarta", "hours": "05h às 08h / 12h às 13h30 / 17h30 às 23h" },
+      { "day": "Quinta", "hours": "05h às 08h / 12h às 13h30 / 17h30 às 23h" }
+    ],
+    "guarantee": {
+      "enabled": true,
+      "title": "Garantia de Continuidade",
+      "text": "Se você fechar um plano mensal e, por algum imprevisto, eu não conseguir te buscar em um dia, eu providencio um Uber para você — por minha conta — para você nunca ficar desamparado(a).",
+      "rules": [
+        "Válido para clientes com plano mensal ativo e agendado.",
+        "Acionamento mediante aviso assim que identificado o imprevisto.",
+        "Aplicável para o deslocamento do trajeto combinado (ou equivalente)."
+      ]
+    },
+    "paymentRules": {
+      "monthly": "Plano mensal: 50% de antecipação no fechamento e 50% ao encerrar o mês.",
+      "single": "Corrida avulsa: pagamento no fim da corrida ou antes — a critério do cliente."
+    }
+  },
+  "copy": {
+    "heroTitle": "Corrida particular com padrão premium e custo inteligente",
+    "heroSubtitle": "Agendamento, pontualidade e previsibilidade para sua rotina em Lages/SC — avulso ou plano mensal.",
+    "heroBadges": ["Lages/SC", "Atendimento agendado", "Planos mensais"],
+    "sectionHowTitle": "Como funciona",
+    "sectionBenefitsTitle": "Por que vale a pena fechar direto comigo",
+    "sectionPlansTitle": "Formatos de atendimento",
+    "sectionQuoteTitle": "Faça um orçamento agora",
+    "sectionFaqTitle": "Perguntas frequentes",
+    "ctaPrimary": "Fazer orçamento",
+    "ctaSecondary": "Falar no WhatsApp"
+  },
+  "quote": {
+    "tripTypes": [
+      { "id": "single", "label": "Avulso (uma corrida)" },
+      { "id": "monthly", "label": "Plano mensal" }
+    ],
+    "monthlyDefaults": {
+      "daysPerMonth": 22,
+      "tripsPerDay": 2
+    },
+    "distance": {
+      "maxKmClamp": 80
+    },
+    "ui": {
+      "showManualKmFallback": true
+    }
+  },
+  "admin": {
+    "enabled": true,
+    "passphrase": "troque-esta-senha"
+  }
+}
