@@ -1,366 +1,348 @@
-/* João Motorista Particular - GitHub-only
-   - Geocoding: Nominatim (OpenStreetMap)
-   - Routing: OSRM demo (router.project-osrm.org)
-   - Fallback: KM manual
-*/
-
-let CONFIG = null;
-
-const el = (id) => document.getElementById(id);
-
-function moneyBRL(value) {
-  try {
-    return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
-  } catch {
-    return `R$ ${value.toFixed(2)}`;
-  }
-}
-
-function clamp(n, min, max) {
-  return Math.max(min, Math.min(max, n));
-}
-
-function toNumber(v) {
-  const n = Number(String(v).replace(",", "."));
-  return Number.isFinite(n) ? n : NaN;
-}
-
-function setMonthlyMode(isMonthly) {
-  document.body.classList.toggle("monthly", isMonthly);
-}
-
-function buildWhatsAppUrl(message) {
-  const phone = CONFIG?.business?.whatsapp_e164 || "";
-  const base = `https://wa.me/${phone}`;
-  const text = encodeURIComponent(message);
-  return `${base}?text=${text}`;
-}
-
-function normalizePlaceQuery(q) {
-  const suffix = CONFIG?.routing?.force_city_suffix || ", Lages, SC, Brasil";
-  const trimmed = (q || "").trim();
-  if (!trimmed) return "";
-  // Se o usuário já escreveu "Lages" ou "SC", não força duplicado demais
-  const lower = trimmed.toLowerCase();
-  if (lower.includes("lages") || lower.includes("sc")) return trimmed;
-  return trimmed + suffix;
-}
-
-async function loadConfig() {
-  const res = await fetch("config.json", { cache: "no-store" });
-  if (!res.ok) throw new Error("Não foi possível carregar config.json");
-  CONFIG = await res.json();
-
-  // Atualiza dados do WhatsApp
-  el("displayPhone").textContent = CONFIG.business.whatsapp_display || "WhatsApp";
-  const mainUrl = buildWhatsAppUrl(
-    `Olá, João! Quero informações sobre corridas particulares em ${CONFIG.business.city}/${CONFIG.business.state}.`
-  );
-  el("btnWhatsMain").href = mainUrl;
-
-  // Botões do topo e planos
-  el("btnHeroWhats").href = mainUrl;
-  el("btnPlanWhats").href = mainUrl;
-
-  // Nota do config
-  const ppk = CONFIG?.pricing?.price_per_km;
-  const baseFee = CONFIG?.pricing?.base_fee;
-  const minFare = CONFIG?.pricing?.minimum_fare;
-  if (typeof ppk !== "number" || typeof baseFee !== "number" || typeof minFare !== "number") {
-    el("configNote").textContent = "Atenção: configure os preços no config.json para o cálculo ficar correto.";
-  } else {
-    el("configNote").textContent =
-      `Config atual: ${moneyBRL(ppk)}/km • taxa base ${moneyBRL(baseFee)} • mínimo ${moneyBRL(minFare)}.`;
-  }
-}
-
-async function geocodeNominatim(place) {
-  // Nominatim exige User-Agent em apps, mas no browser não dá para setar header UA.
-  // Ainda assim costuma funcionar para baixo volume.
-  const url =
-    `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(place)}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("Falha no geocode");
-  const data = await res.json();
-  if (!data || !data[0]) throw new Error("Endereço não encontrado");
-  return {
-    lat: Number(data[0].lat),
-    lon: Number(data[0].lon),
-    display: data[0].display_name || place
-  };
-}
-
-async function routeOSRM(from, to) {
-  const url =
-    `https://router.project-osrm.org/route/v1/driving/${from.lon},${from.lat};${to.lon},${to.lat}?overview=false`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("Falha no cálculo de rota");
-  const data = await res.json();
-  if (!data || !data.routes || !data.routes[0]) throw new Error("Rota não encontrada");
-  const meters = data.routes[0].distance;
-  return meters / 1000;
-}
-
-function calcFare(km) {
-  const ppk = CONFIG.pricing.price_per_km;
-  const baseFee = CONFIG.pricing.base_fee;
-  const minFare = CONFIG.pricing.minimum_fare;
-
-  const raw = (km * ppk) + baseFee;
-  const fare = Math.max(minFare, raw);
-  return { raw, fare };
-}
-
-function monthlyTotal(farePerRide, ridesPerDay, daysPerMonth) {
-  const discount = CONFIG?.pricing?.monthly_discount_percent || 0;
-  const totalRides = ridesPerDay * daysPerMonth;
-  const raw = farePerRide * totalRides;
-  const final = raw * (1 - (discount / 100));
-  return { totalRides, raw, final, discount };
-}
-
-function setResultState(state, text) {
-  const badge = el("resultBadge");
-  badge.textContent = text || "Pronto";
-  if (state === "loading") {
-    badge.style.borderColor = "rgba(251,191,36,.35)";
-    badge.style.background = "rgba(251,191,36,.08)";
-    badge.style.color = "rgba(233,238,252,.85)";
-  } else if (state === "error") {
-    badge.style.borderColor = "rgba(239,68,68,.35)";
-    badge.style.background = "rgba(239,68,68,.08)";
-    badge.style.color = "rgba(233,238,252,.90)";
-  } else {
-    badge.style.borderColor = "rgba(255,255,255,.12)";
-    badge.style.background = "rgba(255,255,255,.05)";
-    badge.style.color = "rgba(233,238,252,.72)";
-  }
-}
-
-function buildTerms(isMonthly, ridesPerDay, daysPerMonth) {
-  const monthlyText = CONFIG?.rules?.monthly_payment_terms || "Plano mensal: 50% antecipado + 50% no fechamento do mês.";
-  const singleText = CONFIG?.rules?.single_payment_terms || "Avulso: pagamento ao final da corrida ou antes.";
-  const guarantee = CONFIG?.rules?.support_guarantee || "";
-
-  if (isMonthly) {
-    return `
-      <ul>
-        <li><strong>${monthlyText}</strong></li>
-        <li><strong>Rotina:</strong> ${ridesPerDay} corrida(s) por dia • ${daysPerMonth} dia(s) no mês.</li>
-        ${guarantee ? `<li><strong>Garantia:</strong> ${guarantee}</li>` : ""}
-      </ul>
-    `;
-  }
-  return `
-    <ul>
-      <li><strong>${singleText}</strong></li>
-      ${guarantee ? `<li><strong>Garantia:</strong> ${guarantee}</li>` : ""}
-    </ul>
-  `;
-}
-
-function buildWhatsMessage(params) {
-  const city = `${CONFIG.business.city}/${CONFIG.business.state}`;
-
-  if (params.isMonthly) {
-    return [
-      `Olá, João! Quero fechar um PLANO MENSAL em ${city}.`,
-      ``,
-      `Origem: ${params.origin}`,
-      `Destino: ${params.destination}`,
-      `Distância estimada: ${params.km.toFixed(1)} km`,
-      `Valor por corrida (estimado): ${moneyBRL(params.farePerRide)}`,
-      `Corridas por dia: ${params.ridesPerDay}`,
-      `Dias no mês: ${params.daysPerMonth}`,
-      `Total de corridas: ${params.totalRides}`,
-      `Total mensal (estimado): ${moneyBRL(params.monthlyFinal)}`,
-      ``,
-      `Forma de pagamento (mensal): 50% antecipado + 50% no fechamento do mês.`,
-      ``,
-      `Pode confirmar disponibilidade e horário?`
-    ].join("\n");
-  }
-
-  return [
-    `Olá, João! Quero uma corrida AVULSA em ${city}.`,
-    ``,
-    `Origem: ${params.origin}`,
-    `Destino: ${params.destination}`,
-    `Distância estimada: ${params.km.toFixed(1)} km`,
-    `Valor estimado: ${moneyBRL(params.farePerRide)}`,
-    ``,
-    `Pagamento: ao final da corrida ou antes, a meu critério.`,
-    ``,
-    `Pode confirmar disponibilidade e horário?`
-  ].join("\n");
-}
-
-async function handleCalc() {
-  const serviceType = el("serviceType").value;
-  const isMonthly = serviceType === "mensal";
-  setMonthlyMode(isMonthly);
-
-  const originRaw = el("origin").value.trim();
-  const destRaw = el("destination").value.trim();
-  const manualKmRaw = el("manualKm").value;
-
-  const ridesPerDay = clamp(parseInt(el("ridesPerDay").value || "2", 10), 1, 20);
-  const daysPerMonth = clamp(parseInt(el("daysPerMonth").value || "22", 10), 1, 31);
-
-  el("termsBody").innerHTML = buildTerms(isMonthly, ridesPerDay, daysPerMonth);
-
-  if (!originRaw || !destRaw) {
-    setResultState("error", "Faltam dados");
-    el("resultSubtitle").textContent = "Informe origem e destino para calcular o orçamento.";
-    return;
-  }
-
-  // Validação preço
-  const ppk = CONFIG?.pricing?.price_per_km;
-  const baseFee = CONFIG?.pricing?.base_fee;
-  const minFare = CONFIG?.pricing?.minimum_fare;
-  if (![ppk, baseFee, minFare].every((x) => typeof x === "number" && Number.isFinite(x) && x >= 0)) {
-    setResultState("error", "Config");
-    el("resultSubtitle").textContent = "Configure os preços no config.json (price_per_km, base_fee, minimum_fare).";
-    return;
-  }
-
-  setResultState("loading", "Calculando...");
-  el("resultSubtitle").textContent = "Calculando distância e valor estimado...";
-
-  let km = NaN;
-  let kmSource = "";
-
-  // 1) Tenta KM manual se informado
-  const manualKm = toNumber(manualKmRaw);
-  if (Number.isFinite(manualKm) && manualKm > 0) {
-    km = manualKm;
-    kmSource = "KM informado manualmente.";
-  } else {
-    // 2) Tenta cálculo automático via OSM+OSRM
-    try {
-      const originQ = normalizePlaceQuery(originRaw);
-      const destQ = normalizePlaceQuery(destRaw);
-
-      const from = await geocodeNominatim(originQ);
-      const to = await geocodeNominatim(destQ);
-
-      const kmAuto = await routeOSRM(from, to);
-      if (!Number.isFinite(kmAuto) || kmAuto <= 0) throw new Error("KM inválido");
-      km = kmAuto;
-      kmSource = "Distância calculada automaticamente.";
-    } catch (err) {
-      km = NaN;
-      kmSource = "";
+// script.js - Lógica da calculadora e funcionalidades
+document.addEventListener('DOMContentLoaded', function() {
+    // Elementos do DOM
+    const origemInput = document.getElementById('origem');
+    const destinoInput = document.getElementById('destino');
+    const tipoServicoSelect = document.getElementById('tipo-servico');
+    const mensalOptions = document.getElementById('mensal-options');
+    const calcularBtn = document.getElementById('calcular-btn');
+    const limparBtn = document.getElementById('limpar-btn');
+    const sugestoesOrigem = document.getElementById('sugestoes-origem');
+    const sugestoesDestino = document.getElementById('sugestoes-destino');
+    
+    // Elementos de resultado
+    const resultadoDistancia = document.getElementById('resultado-distancia');
+    const resultadoTempo = document.getElementById('resultado-tempo');
+    const resultadoValorBase = document.getElementById('resultado-valor-base');
+    const resultadoMensal = document.getElementById('resultado-mensal');
+    const resultadoTotal = document.getElementById('valor-total');
+    const whatsappBtn = document.getElementById('whatsapp-btn');
+    
+    // Preço por km
+    const PRECO_POR_KM = 2.00;
+    
+    // Configurar sugestões de endereço
+    origemInput.addEventListener('input', function() {
+        filtrarSugestoes(this.value, sugestoesOrigem);
+    });
+    
+    destinoInput.addEventListener('input', function() {
+        filtrarSugestoes(this.value, sugestoesDestino);
+    });
+    
+    // Mostrar/ocultar opções mensais
+    tipoServicoSelect.addEventListener('change', function() {
+        if (this.value === 'mensal') {
+            mensalOptions.style.display = 'block';
+            resultadoMensal.style.display = 'flex';
+        } else {
+            mensalOptions.style.display = 'none';
+            resultadoMensal.style.display = 'none';
+        }
+    });
+    
+    // Função para filtrar sugestões
+    function filtrarSugestoes(valor, container) {
+        if (!valor || valor.length < 2) {
+            container.style.display = 'none';
+            return;
+        }
+        
+        const termo = valor.toLowerCase();
+        const sugestoesFiltradas = ruasLages.filter(rua => 
+            rua.toLowerCase().includes(termo)
+        ).slice(0, 8);
+        
+        if (sugestoesFiltradas.length > 0) {
+            container.innerHTML = sugestoesFiltradas.map(rua => 
+                `<div class="sugestoes-item" data-rua="${rua}">${rua}</div>`
+            ).join('');
+            container.style.display = 'block';
+            
+            // Adicionar evento de clique nas sugestões
+            container.querySelectorAll('.sugestoes-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const input = container.id === 'sugestoes-origem' ? origemInput : destinoInput;
+                    input.value = this.getAttribute('data-rua');
+                    container.style.display = 'none';
+                });
+            });
+        } else {
+            container.style.display = 'none';
+        }
     }
-  }
-
-  if (!Number.isFinite(km) || km <= 0) {
-    setResultState("error", "Falhou");
-    el("resultSubtitle").textContent =
-      "Não consegui calcular automaticamente. Informe o KM manual (campo “KM manual”) e tente novamente.";
-    el("kmValue").textContent = "—";
-    el("kmFoot").textContent = "Use KM manual.";
-    el("fareLabel").textContent = isMonthly ? "Valor por corrida" : "Valor estimado";
-    el("fareValue").textContent = "—";
-    el("fareFoot").textContent = "—";
-    el("monthlyValue").textContent = "—";
-    el("monthlyFoot").textContent = "—";
-    return;
-  }
-
-  // Cálculo de valores
-  const { raw, fare } = calcFare(km);
-  el("kmValue").textContent = `${km.toFixed(1)} km`;
-  el("kmFoot").textContent = kmSource || "—";
-
-  el("fareLabel").textContent = isMonthly ? "Valor por corrida" : "Valor estimado";
-  el("fareValue").textContent = moneyBRL(fare);
-
-  const breakdown = `(${km.toFixed(1)} km × ${moneyBRL(CONFIG.pricing.price_per_km)}) + taxa ${moneyBRL(CONFIG.pricing.base_fee)} = ${moneyBRL(raw)} • mínimo ${moneyBRL(CONFIG.pricing.minimum_fare)}`;
-  el("fareFoot").textContent = breakdown;
-
-  // Mensal
-  let monthlyInfo = null;
-  if (isMonthly) {
-    monthlyInfo = monthlyTotal(fare, ridesPerDay, daysPerMonth);
-    el("monthlyValue").textContent = moneyBRL(monthlyInfo.final);
-
-    const parts = [];
-    parts.push(`${monthlyInfo.totalRides} corrida(s) no mês`);
-    if (monthlyInfo.discount > 0) {
-      parts.push(`desconto ${monthlyInfo.discount}% aplicado`);
-    } else {
-      parts.push(`sem desconto configurado`);
+    
+    // Fechar sugestões ao clicar fora
+    document.addEventListener('click', function(e) {
+        if (!origemInput.contains(e.target) && !sugestoesOrigem.contains(e.target)) {
+            sugestoesOrigem.style.display = 'none';
+        }
+        if (!destinoInput.contains(e.target) && !sugestoesDestino.contains(e.target)) {
+            sugestoesDestino.style.display = 'none';
+        }
+    });
+    
+    // Limpar formulário
+    limparBtn.addEventListener('click', function() {
+        origemInput.value = '';
+        destinoInput.value = '';
+        tipoServicoSelect.value = 'avulso';
+        mensalOptions.style.display = 'none';
+        
+        resultadoDistancia.innerHTML = '<span>Distância:</span><span class="valor">--</span>';
+        resultadoTempo.innerHTML = '<span>Tempo estimado:</span><span class="valor">--</span>';
+        resultadoValorBase.innerHTML = '<span>Valor por corrida:</span><span class="valor">--</span>';
+        resultadoMensal.innerHTML = '<span>Corridas no mês:</span><span class="valor">--</span>';
+        resultadoTotal.textContent = 'R$ 0,00';
+        
+        sugestoesOrigem.style.display = 'none';
+        sugestoesDestino.style.display = 'none';
+        resultadoMensal.style.display = 'none';
+    });
+    
+    // Calcular orçamento
+    calcularBtn.addEventListener('click', async function() {
+        // Validar entrada
+        if (!origemInput.value.trim() || !destinoInput.value.trim()) {
+            alert('Por favor, informe origem e destino');
+            return;
+        }
+        
+        if (origemInput.value.trim().toLowerCase() === destinoInput.value.trim().toLowerCase()) {
+            alert('Origem e destino não podem ser iguais');
+            return;
+        }
+        
+        // Mostrar loading
+        calcularBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Calculando...';
+        calcularBtn.disabled = true;
+        
+        try {
+            // Calcular distância
+            const distancia = await calcularDistanciaOSRM(
+                origemInput.value.trim(), 
+                destinoInput.value.trim()
+            );
+            
+            // Calcular tempo estimado (considerando 30km/h média em cidade)
+            const tempoMinutos = Math.round((distancia / 30) * 60);
+            
+            // Calcular valores
+            const valorPorCorrida = distancia * PRECO_POR_KM;
+            
+            let corridasNoMes = 0;
+            let valorTotal = valorPorCorrida;
+            
+            if (tipoServicoSelect.value === 'mensal') {
+                const diasPorSemana = parseInt(document.getElementById('dias-semana').value) || 5;
+                const semanasNoMes = parseInt(document.getElementById('semanas-mes').value) || 4;
+                corridasNoMes = diasPorSemana * semanasNoMes;
+                valorTotal = valorPorCorrida * corridasNoMes;
+            }
+            
+            // Atualizar resultados
+            resultadoDistancia.innerHTML = `<span>Distância:</span><span class="valor">${distancia.toFixed(1)} km</span>`;
+            
+            resultadoTempo.innerHTML = `<span>Tempo estimado:</span><span class="valor">${tempoMinutos} min</span>`;
+            
+            resultadoValorBase.innerHTML = `<span>Valor por corrida:</span><span class="valor">R$ ${valorPorCorrida.toFixed(2)}</span>`;
+            
+            if (tipoServicoSelect.value === 'mensal') {
+                resultadoMensal.innerHTML = `<span>Corridas no mês:</span><span class="valor">${corridasNoMes}</span>`;
+            }
+            
+            resultadoTotal.textContent = `R$ ${valorTotal.toFixed(2)}`;
+            
+            // Atualizar link do WhatsApp
+            const mensagem = `Olá João! Gostaria de orçar uma corrida:\n` +
+                            `Origem: ${origemInput.value}\n` +
+                            `Destino: ${destinoInput.value}\n` +
+                            `Distância: ${distancia.toFixed(1)} km\n` +
+                            `Valor: R$ ${valorTotal.toFixed(2)} ${tipoServicoSelect.value === 'mensal' ? '(Plano Mensal)' : '(Avulso)'}`;
+            
+            whatsappBtn.href = `https://wa.me/5549984094010?text=${encodeURIComponent(mensagem)}`;
+            
+        } catch (error) {
+            console.error('Erro ao calcular:', error);
+            
+            // Fallback: usar cálculo aproximado
+            const distanciaAproximada = calcularDistanciaAproximada(
+                origemInput.value.trim(),
+                destinoInput.value.trim()
+            );
+            
+            if (distanciaAproximada) {
+                // Recalcular com distância aproximada
+                const valorPorCorrida = distanciaAproximada * PRECO_POR_KM;
+                const tempoMinutos = Math.round((distanciaAproximada / 30) * 60);
+                
+                let corridasNoMes = 0;
+                let valorTotal = valorPorCorrida;
+                
+                if (tipoServicoSelect.value === 'mensal') {
+                    const diasPorSemana = parseInt(document.getElementById('dias-semana').value) || 5;
+                    const semanasNoMes = parseInt(document.getElementById('semanas-mes').value) || 4;
+                    corridasNoMes = diasPorSemana * semanasNoMes;
+                    valorTotal = valorPorCorrida * corridasNoMes;
+                }
+                
+                resultadoDistancia.innerHTML = `<span>Distância (aproximada):</span><span class="valor">${distanciaAproximada} km</span>`;
+                resultadoTempo.innerHTML = `<span>Tempo estimado:</span><span class="valor">${tempoMinutos} min</span>`;
+                resultadoValorBase.innerHTML = `<span>Valor por corrida:</span><span class="valor">R$ ${valorPorCorrida.toFixed(2)}</span>`;
+                
+                if (tipoServicoSelect.value === 'mensal') {
+                    resultadoMensal.innerHTML = `<span>Corridas no mês:</span><span class="valor">${corridasNoMes}</span>`;
+                }
+                
+                resultadoTotal.textContent = `R$ ${valorTotal.toFixed(2)}`;
+                
+                // Atualizar link do WhatsApp
+                const mensagem = `Olá João! Gostaria de orçar uma corrida:\n` +
+                                `Origem: ${origemInput.value}\n` +
+                                `Destino: ${destinoInput.value}\n` +
+                                `Distância aproximada: ${distanciaAproximada} km\n` +
+                                `Valor: R$ ${valorTotal.toFixed(2)} ${tipoServicoSelect.value === 'mensal' ? '(Plano Mensal)' : '(Avulso)'}`;
+                
+                whatsappBtn.href = `https://wa.me/5549984094010?text=${encodeURIComponent(mensagem)}`;
+            } else {
+                alert('Não foi possível calcular a distância. Por favor, verifique os endereços ou entre em contato diretamente.');
+            }
+        } finally {
+            // Restaurar botão
+            calcularBtn.innerHTML = '<i class="fas fa-calculator"></i> Calcular Orçamento';
+            calcularBtn.disabled = false;
+        }
+    });
+    
+    // Função para calcular distância usando OSRM (gratuito)
+    async function calcularDistanciaOSRM(origem, destino) {
+        // Primeiro, tentamos obter coordenadas aproximadas
+        const coordsOrigem = await obterCoordenadasAproximadas(origem);
+        const coordsDestino = await obterCoordenadasAproximadas(destino);
+        
+        // Se não conseguimos coordenadas, lançar erro
+        if (!coordsOrigem || !coordsDestino) {
+            throw new Error('Não foi possível obter coordenadas para os endereços');
+        }
+        
+        // Chamar API OSRM
+        const response = await fetch(
+            `https://router.project-osrm.org/route/v1/driving/` +
+            `${coordsOrigem.lon},${coordsOrigem.lat};` +
+            `${coordsDestino.lon},${coordsDestino.lat}?overview=false`
+        );
+        
+        if (!response.ok) {
+            throw new Error('Erro ao calcular rota');
+        }
+        
+        const data = await response.json();
+        
+        if (data.routes && data.routes.length > 0) {
+            // Distância em km (API retorna em metros)
+            const distanciaMetros = data.routes[0].distance;
+            const distanciaKm = distanciaMetros / 1000;
+            
+            return distanciaKm;
+        } else {
+            throw new Error('Rota não encontrada');
+        }
     }
-    parts.push(`pagamento: 50% antecipado + 50% no fechamento do mês`);
-    el("monthlyFoot").textContent = parts.join(" • ");
-  }
-
-  // Atualiza regras
-  el("termsBody").innerHTML = buildTerms(isMonthly, ridesPerDay, daysPerMonth);
-
-  // WhatsApp orçamento
-  const msg = buildWhatsMessage({
-    isMonthly,
-    origin: originRaw,
-    destination: destRaw,
-    km,
-    farePerRide: fare,
-    ridesPerDay,
-    daysPerMonth,
-    totalRides: monthlyInfo?.totalRides || 1,
-    monthlyFinal: monthlyInfo?.final || fare
-  });
-
-  const url = buildWhatsAppUrl(msg);
-  el("btnWhatsQuote").href = url;
-  el("btnWhatsQuote").setAttribute("target", "_blank");
-  el("btnWhatsQuote").setAttribute("rel", "noopener");
-
-  // Subtítulo
-  setResultState("ok", "Calculado");
-  if (isMonthly) {
-    el("resultSubtitle").textContent =
-      "Orçamento mensal estimado pronto. Clique em “Enviar orçamento no WhatsApp” para fechar.";
-  } else {
-    el("resultSubtitle").textContent =
-      "Orçamento avulso estimado pronto. Clique em “Enviar orçamento no WhatsApp” para confirmar.";
-  }
-}
-
-function setLiveStatusText() {
-  // Texto simples de status sem depender de hora do usuário (pode estar diferente).
-  // Mantém “ativo” visualmente.
-  el("statusText").textContent = "Horários definidos • Demais dias sob consulta";
-}
-
-function bindUi() {
-  // Tipo
-  el("serviceType").addEventListener("change", () => {
-    const isMonthly = el("serviceType").value === "mensal";
-    setMonthlyMode(isMonthly);
-    el("termsBody").innerHTML = buildTerms(isMonthly, Number(el("ridesPerDay").value), Number(el("daysPerMonth").value));
-  });
-
-  // Calcular
-  el("calcBtn").addEventListener("click", handleCalc);
-
-  // Inicializa termos
-  el("termsBody").innerHTML = buildTerms(false, 2, 22);
-}
-
-(async function init() {
-  try {
-    await loadConfig();
-    setLiveStatusText();
-    bindUi();
-    setMonthlyMode(false);
-  } catch (e) {
-    console.error(e);
-    // Mostra fallback básico
-    el("displayPhone").textContent = "(WhatsApp indisponível)";
-    el("statusText").textContent = "Config não carregada";
-    el("configNote").textContent = "Erro ao carregar config.json. Verifique se o arquivo existe na raiz do site.";
-  }
-})();
+    
+    // Função para obter coordenadas aproximadas baseadas no nome da rua/bairro
+    async function obterCoordenadasAproximadas(local) {
+        // Coordenadas centrais de Lages
+        const centroLages = {
+            lat: -27.8153,
+            lon: -50.3259
+        };
+        
+        // Mapeamento aproximado de bairros/regiões
+        const regioes = {
+            'centro': {lat: -27.8160, lon: -50.3265},
+            'conta dinheiro': {lat: -27.8100, lon: -50.3200},
+            'habitação': {lat: -27.8300, lon: -50.3400},
+            'são francisco': {lat: -27.8050, lon: -50.3300},
+            'santa clara': {lat: -27.8400, lon: -50.3200},
+            'copacabana': {lat: -27.8000, lon: -50.3500},
+            'gethal': {lat: -27.8200, lon: -50.3000},
+            'caroba': {lat: -27.8500, lon: -50.3100}
+        };
+        
+        const localLower = local.toLowerCase();
+        
+        // Verificar se é uma região conhecida
+        for (const [regiao, coords] of Object.entries(regioes)) {
+            if (localLower.includes(regiao)) {
+                return coords;
+            }
+        }
+        
+        // Se não encontrou, retorna centro de Lages com pequena variação
+        // para evitar cálculo de distância zero
+        const variacao = Math.random() * 0.01; // Pequena variação de ~1km
+        return {
+            lat: centroLages.lat + (Math.random() > 0.5 ? variacao : -variacao),
+            lon: centroLages.lon + (Math.random() > 0.5 ? variacao : -variacao)
+        };
+    }
+    
+    // Função de fallback: cálculo aproximado baseado em bairros
+    function calcularDistanciaAproximada(origem, destino) {
+        const origemLower = origem.toLowerCase();
+        const destinoLower = destino.toLowerCase();
+        
+        // Extrair bairro da origem
+        let bairroOrigem = 'centro';
+        for (const bairro of Object.keys(distanciasBairros)) {
+            const bairroNome = bairro.split('-')[0].toLowerCase();
+            if (origemLower.includes(bairroNome)) {
+                bairroOrigem = bairroNome;
+                break;
+            }
+        }
+        
+        // Extrair bairro do destino
+        let bairroDestino = 'centro';
+        for (const bairro of Object.keys(distanciasBairros)) {
+            const bairroNome = bairro.split('-')[1].toLowerCase();
+            if (destinoLower.includes(bairroNome)) {
+                bairroDestino = bairroNome;
+                break;
+            }
+        }
+        
+        // Verificar se temos distância direta
+        const chaveDireta = `${bairroOrigem}-${bairroDestino}`;
+        const chaveInversa = `${bairroDestino}-${bairroOrigem}`;
+        
+        if (distanciasBairros[chaveDireta]) {
+            return distanciasBairros[chaveDireta];
+        } else if (distanciasBairros[chaveInversa]) {
+            return distanciasBairros[chaveInversa];
+        } else {
+            // Distância padrão para bairros não mapeados
+            return 4.0; // 4km como média
+        }
+    }
+    
+    // Inicialização
+    function init() {
+        // Configurar valores padrão
+        document.getElementById('dias-semana').value = 5;
+        document.getElementById('semanas-mes').value = 4;
+        
+        // Adicionar evento para calcular ao pressionar Enter
+        origemInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') calcularBtn.click();
+        });
+        
+        destinoInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') calcularBtn.click();
+        });
+        
+        console.log('Sistema João Motorista Particular inicializado!');
+    }
+    
+    init();
+});
