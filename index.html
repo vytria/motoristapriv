@@ -2,422 +2,457 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="#0b1220" />
-  <title>João Motorista Particular — Lages/SC</title>
-  <meta name="description" content="Corridas particulares em Lages/SC com padrão premium. Avulso ou plano mensal com garantia de continuidade. Faça seu orçamento agora." />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>João Motorista Particular | Lages/SC</title>
+  <meta name="description" content="Corridas particulares em Lages/SC com atendimento premium, planos mensais e garantia de suporte. Faça seu orçamento agora." />
+  <meta name="theme-color" content="#0a1020" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
   <div class="bg">
     <div class="bg-grid"></div>
-    <div class="bg-glow"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
   </div>
 
-  <header class="topbar">
-    <div class="container topbar__inner">
-      <div class="brand">
-        <div class="brand__mark" aria-hidden="true"></div>
-        <div class="brand__text">
-          <div class="brand__name" id="brandName">João Motorista Particular</div>
-          <div class="brand__meta" id="brandMeta">Lages/SC • Atendimento agendado</div>
+  <header class="header">
+    <div class="container header-inner">
+      <a class="brand" href="#top" aria-label="Voltar ao topo">
+        <div class="brand-mark">JM</div>
+        <div class="brand-text">
+          <div class="brand-title">João Motorista Particular</div>
+          <div class="brand-subtitle">Lages/SC • Atendimento Premium</div>
         </div>
-      </div>
+      </a>
 
       <nav class="nav">
         <a href="#como-funciona">Como funciona</a>
         <a href="#beneficios">Benefícios</a>
         <a href="#planos">Planos</a>
-        <a href="#orcamento" class="pill">Orçamento</a>
+        <a href="#orcamento" class="nav-cta">Fazer orçamento</a>
       </nav>
-
-      <div class="topbar__actions">
-        <a class="btn btn--ghost" id="btnWhatsTop" target="_blank" rel="noopener">WhatsApp</a>
-        <a class="btn btn--primary" href="#orcamento" id="btnTopQuote">Fazer orçamento</a>
-      </div>
     </div>
   </header>
 
-  <main>
+  <main id="top">
+    <!-- HERO -->
     <section class="hero">
-      <div class="container hero__inner">
-        <div class="hero__copy">
-          <div class="chips" id="heroBadges"></div>
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <div class="pill">
+            <span class="pill-dot"></span>
+            <span>Corridas particulares com previsibilidade e conforto</span>
+          </div>
 
-          <h1 id="heroTitle">Corrida particular com padrão premium e custo inteligente</h1>
-          <p class="lead" id="heroSubtitle">
-            Agendamento, pontualidade e previsibilidade para sua rotina em Lages/SC — avulso ou plano mensal.
+          <h1>
+            Seu transporte em Lages/SC, com padrão premium e plano fixo quando você precisa.
+          </h1>
+
+          <p class="lead">
+            Ideal para trabalho, faculdade, consultas e compromissos. Você agenda, eu confirmo, eu cumpro.
+            E se surgir algum imprevisto meu, você não fica desamparado.
           </p>
 
-          <div class="hero__cta">
-            <a class="btn btn--primary btn--lg" href="#orcamento" id="btnHeroQuote">Fazer orçamento</a>
-            <a class="btn btn--ghost btn--lg" id="btnHeroWhats" target="_blank" rel="noopener">Falar no WhatsApp</a>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#orcamento">Fazer orçamento agora</a>
+            <a class="btn btn-ghost" href="#whatsapp" id="btnHeroWhats">Falar no WhatsApp</a>
           </div>
 
-          <div class="hero__fineprint">
-            <div class="fineprint__item">
-              <div class="dot"></div>
-              <div>
-                <strong>Regras claras:</strong>
-                <span id="ruleMonthly">Plano mensal: 50% de antecipação no fechamento e 50% ao encerrar o mês.</span>
-              </div>
+          <div class="trust-row">
+            <div class="trust-item">
+              <div class="trust-title">Atendimento com compromisso</div>
+              <div class="trust-desc">Acordo claro, horário combinado e transparência.</div>
             </div>
-            <div class="fineprint__item">
-              <div class="dot"></div>
-              <div>
-                <strong>Avulso:</strong>
-                <span id="ruleSingle">Corrida avulsa: pagamento no fim da corrida ou antes — a critério do cliente.</span>
-              </div>
+            <div class="trust-item">
+              <div class="trust-title">Planos mensais e avulsos</div>
+              <div class="trust-desc">Fixos (rotina) ou esporádicos (quando precisar).</div>
+            </div>
+            <div class="trust-item">
+              <div class="trust-title">Regra de pagamento objetiva</div>
+              <div class="trust-desc">Mensal: 50% antecipado + 50% no fechamento do mês.</div>
             </div>
           </div>
         </div>
 
-        <div class="hero__card">
-          <div class="card card--glass">
-            <div class="card__head">
-              <div class="card__title">Atendimento premium</div>
-              <div class="card__subtitle" id="coverageText">Atendimento dentro de Lages/SC.</div>
+        <div class="hero-card">
+          <div class="card card-hero">
+            <div class="card-hero-top">
+              <div class="tag">Disponibilidade</div>
+              <div class="status">
+                <span class="status-dot"></span>
+                <span id="statusText">Carregando horários...</span>
+              </div>
             </div>
 
-            <div class="schedule" id="schedule"></div>
+            <div class="schedule">
+              <div class="schedule-row">
+                <div class="schedule-day">Segunda</div>
+                <div class="schedule-time">05h–08h • 12h–13h30 • 17h30–23h</div>
+              </div>
+              <div class="schedule-row">
+                <div class="schedule-day">Terça</div>
+                <div class="schedule-time">05h–08h • 12h–13h30 • 17h30–23h</div>
+              </div>
+              <div class="schedule-row">
+                <div class="schedule-day">Quarta</div>
+                <div class="schedule-time">05h–08h • 12h–13h30 • 17h30–23h</div>
+              </div>
+              <div class="schedule-row">
+                <div class="schedule-day">Quinta</div>
+                <div class="schedule-time">05h–08h • 12h–13h30 • 17h30–23h</div>
+              </div>
 
-            <div class="card__footer">
-              <div class="mini">
-                <div class="mini__label">WhatsApp</div>
-                <div class="mini__value" id="whatsDisplay">(49) 9 8409-4010</div>
+              <div class="schedule-note">
+                Demais dias/horários: <strong>sob consulta</strong>.
               </div>
-              <a class="btn btn--primary" id="btnCardWhats" target="_blank" rel="noopener">Chamar agora</a>
             </div>
-          </div>
 
-          <div class="trust">
-            <div class="trust__item">
-              <div class="trust__icon">✓</div>
-              <div class="trust__text">
-                <strong>Pontualidade e compromisso</strong>
-                <span>Agendamento para rotina, consultas, trabalho e faculdade.</span>
-              </div>
-            </div>
-            <div class="trust__item">
-              <div class="trust__icon">✓</div>
-              <div class="trust__text">
-                <strong>Previsibilidade</strong>
-                <span>Você sabe como funciona e quanto vai pagar.</span>
-              </div>
-            </div>
-            <div class="trust__item" id="guaranteeMini" style="display:none;">
-              <div class="trust__icon">✓</div>
-              <div class="trust__text">
-                <strong>Continuidade</strong>
-                <span>Se eu não puder, eu providencio um Uber por minha conta.</span>
-              </div>
+            <div class="divider"></div>
+
+            <div class="mini-cta">
+              <div class="mini-cta-title">Quer fechar um plano fixo?</div>
+              <div class="mini-cta-desc">Eu organizo a rotina com você e confirmo os horários.</div>
+              <a class="btn btn-primary btn-block" href="#orcamento">Simular orçamento</a>
             </div>
           </div>
         </div>
       </div>
     </section>
 
+    <!-- COMO FUNCIONA -->
     <section class="section" id="como-funciona">
       <div class="container">
-        <div class="section__head">
-          <h2 id="howTitle">Como funciona</h2>
-          <p>Simples, transparente e orientado à sua rotina.</p>
+        <div class="section-head">
+          <h2>Como funciona</h2>
+          <p>Um processo simples e objetivo, com regra de negócio clara desde o início.</p>
         </div>
 
-        <div class="grid3">
-          <div class="feature card">
-            <div class="feature__top">
-              <div class="num">1</div>
-              <h3>Você agenda</h3>
-            </div>
-            <p>Informe origem, destino e horários. Para plano mensal, definimos sua rotina fixa.</p>
+        <div class="grid-3">
+          <div class="card">
+            <div class="icon">1</div>
+            <h3>Você informa origem e destino</h3>
+            <p>Avulso ou mensal. Tudo dentro de Lages/SC.</p>
           </div>
 
-          <div class="feature card">
-            <div class="feature__top">
-              <div class="num">2</div>
-              <h3>Eu busco no horário</h3>
-            </div>
-            <p>Atendimento com padrão premium, focado em pontualidade e conforto.</p>
+          <div class="card">
+            <div class="icon">2</div>
+            <h3>Eu confirmo o combinado</h3>
+            <p>Horário, local e forma de pagamento, sem surpresa.</p>
           </div>
 
-          <div class="feature card">
-            <div class="feature__top">
-              <div class="num">3</div>
-              <h3>Você não fica na mão</h3>
-            </div>
-            <p>Em plano mensal, se houver imprevisto do meu lado, eu garanto o deslocamento chamando um Uber por minha conta.</p>
+          <div class="card">
+            <div class="icon">3</div>
+            <h3>Você tem previsibilidade</h3>
+            <p>Plano mensal com rotina fixa ou corridas esporádicas quando precisar.</p>
+          </div>
+        </div>
+
+        <div class="callout">
+          <div class="callout-title">Regra de pagamento</div>
+          <div class="callout-body">
+            <ul>
+              <li><strong>Plano mensal:</strong> 50% antecipado no fechamento + 50% no fechamento do mês.</li>
+              <li><strong>Avulso:</strong> pagamento ao final da corrida ou antes, a critério do cliente.</li>
+            </ul>
           </div>
         </div>
       </div>
     </section>
 
+    <!-- BENEFÍCIOS -->
     <section class="section" id="beneficios">
       <div class="container">
-        <div class="section__head">
-          <h2 id="benefitsTitle">Por que vale a pena fechar direto comigo</h2>
-          <p>Você troca incerteza por previsibilidade — com um atendimento mais humano e alinhado à sua rotina.</p>
+        <div class="section-head">
+          <h2>Por que vale a pena fazer particular comigo</h2>
+          <p>Você troca “corrida aleatória” por um serviço com compromisso e padrão.</p>
         </div>
 
-        <div class="grid2">
+        <div class="grid-2">
           <div class="card">
-            <h3>Custo inteligente</h3>
-            <p>Para quem usa com frequência, o plano mensal tende a ser mais vantajoso e previsível.</p>
-            <div class="divider"></div>
-            <ul class="list">
-              <li>Orçamento claro antes de fechar</li>
-              <li>Sem surpresas no dia a dia</li>
-              <li>Configuração por quilômetro + taxa mínima</li>
-            </ul>
+            <h3>Economia com previsibilidade</h3>
+            <p>Você sabe o custo estimado com antecedência e evita variações do aplicativo.</p>
           </div>
 
           <div class="card">
-            <h3>Rotina garantida</h3>
-            <p>Ideal para trabalho, faculdade, consultas e compromissos onde pontualidade é prioridade.</p>
-            <div class="divider"></div>
-            <ul class="list">
-              <li>Horário combinado e recorrência</li>
-              <li>Confiabilidade e constância</li>
-              <li>Garantia de continuidade no plano mensal</li>
-            </ul>
+            <h3>Rotina garantida (plano fixo)</h3>
+            <p>Se você precisa sair no horário certo todo dia, um plano mensal resolve.</p>
           </div>
-        </div>
 
-        <div class="banner" id="guaranteeBlock" style="display:none;">
-          <div class="banner__left">
-            <h3 id="guaranteeTitle">Garantia de Continuidade</h3>
-            <p id="guaranteeText"></p>
+          <div class="card">
+            <h3>Atendimento premium</h3>
+            <p>Tratamento profissional, alinhamento claro e experiência consistente.</p>
           </div>
-          <div class="banner__right">
-            <ul class="list list--compact" id="guaranteeRules"></ul>
+
+          <div class="card">
+            <h3>Garantia de suporte</h3>
+            <p>
+              Se surgir um imprevisto e eu não conseguir te buscar no dia do plano,
+              eu providencio um Uber para você e sai por minha conta.
+            </p>
           </div>
         </div>
       </div>
     </section>
 
+    <!-- PLANOS -->
     <section class="section" id="planos">
       <div class="container">
-        <div class="section__head">
-          <h2 id="plansTitle">Formatos de atendimento</h2>
-          <p>Escolha o formato que faz sentido para sua rotina.</p>
+        <div class="section-head">
+          <h2>Planos</h2>
+          <p>Escolha o formato ideal. Você pode começar no avulso e migrar para mensal quando fizer sentido.</p>
         </div>
 
-        <div class="grid3">
-          <div class="plan card">
-            <div class="plan__tag">Flexível</div>
-            <h3>Avulso</h3>
-            <p>Para corridas esporádicas, sem recorrência.</p>
-            <div class="divider"></div>
-            <ul class="list">
-              <li>Pagamento ao final ou antes</li>
-              <li>Ideal para saídas pontuais</li>
-              <li>Orçamento imediato</li>
+        <div class="pricing">
+          <div class="card price-card">
+            <div class="price-top">
+              <div class="price-name">Avulso</div>
+              <div class="price-pill">Flexível</div>
+            </div>
+            <ul class="price-list">
+              <li>Pagamento ao final da corrida ou antes</li>
+              <li>Ideal para necessidades pontuais</li>
+              <li>Orçamento rápido pela calculadora</li>
             </ul>
-            <a href="#orcamento" class="btn btn--ghost">Orçar avulso</a>
+            <a class="btn btn-ghost btn-block" href="#orcamento">Simular avulso</a>
           </div>
 
-          <div class="plan card plan--highlight">
-            <div class="plan__tag">Mais vendido</div>
-            <h3>Plano mensal</h3>
-            <p>Rotina fixa com previsibilidade e prioridade.</p>
-            <div class="divider"></div>
-            <ul class="list">
-              <li><strong>50% antecipado</strong> + 50% no fechamento do mês</li>
-              <li>Desconto configurável</li>
-              <li>Garantia de continuidade</li>
+          <div class="card price-card featured">
+            <div class="price-top">
+              <div class="price-name">Mensal</div>
+              <div class="price-pill">Rotina fixa</div>
+            </div>
+            <ul class="price-list">
+              <li>50% antecipado + 50% no fechamento do mês</li>
+              <li>Ideal para trabalho/faculdade/rotina</li>
+              <li>Garantia de suporte em imprevistos</li>
             </ul>
-            <a href="#orcamento" class="btn btn--primary">Orçar plano mensal</a>
+            <a class="btn btn-primary btn-block" href="#orcamento">Simular mensal</a>
           </div>
 
-          <div class="plan card">
-            <div class="plan__tag">Sob medida</div>
-            <h3>Fixo por horário</h3>
-            <p>Para quem precisa de pontualidade em horários específicos.</p>
-            <div class="divider"></div>
-            <ul class="list">
-              <li>Definição de janela de horários</li>
-              <li>Ajuste conforme rotina</li>
-              <li>Atendimento recorrente</li>
+          <div class="card price-card">
+            <div class="price-top">
+              <div class="price-name">Sob medida</div>
+              <div class="price-pill">Parcerias</div>
+            </div>
+            <ul class="price-list">
+              <li>Empresas, turnos, horários alternados</li>
+              <li>Pacotes e rotas personalizadas</li>
+              <li>Fechamento direto no WhatsApp</li>
             </ul>
-            <a class="btn btn--ghost" id="btnWhatsPlans" target="_blank" rel="noopener">Conversar</a>
+            <a class="btn btn-ghost btn-block" href="#whatsapp" id="btnPlanWhats">Conversar agora</a>
           </div>
         </div>
       </div>
     </section>
 
+    <!-- ORÇAMENTO -->
     <section class="section" id="orcamento">
       <div class="container">
-        <div class="section__head">
-          <h2 id="quoteTitle">Faça um orçamento agora</h2>
-          <p>Digite origem e destino em Lages/SC. Se preferir, informe o km manualmente.</p>
+        <div class="section-head">
+          <h2>Orçamento em Lages/SC</h2>
+          <p>Informe origem e destino. Eu calculo a distância estimada e o valor conforme as regras configuradas.</p>
         </div>
 
-        <div class="quote card card--glass">
-          <div class="quote__form">
+        <div class="card quote-card">
+          <div class="quote-grid">
             <div class="field">
-              <label>Tipo</label>
-              <select id="tripType"></select>
-            </div>
-
-            <div class="field">
-              <label>Origem (Lages/SC)</label>
-              <input id="origin" type="text" placeholder="Ex: Rua Maria Ribas Pinto, Lages" autocomplete="off" />
-              <div class="hint">Dica: comece com rua/avenida + número ou bairro.</div>
+              <label for="serviceType">Tipo</label>
+              <select id="serviceType">
+                <option value="avulso">Avulso (1 corrida)</option>
+                <option value="mensal">Plano mensal</option>
+              </select>
             </div>
 
             <div class="field">
-              <label>Destino (Lages/SC)</label>
-              <input id="destination" type="text" placeholder="Ex: Rua João José Godinho, Lages" autocomplete="off" />
+              <label for="origin">Origem (Lages/SC)</label>
+              <input id="origin" type="text" placeholder="Ex.: Rua X, Bairro Y" autocomplete="off">
+              <div class="hint">Dica: escreva rua + bairro. Ex.: “Rua X, Centro”.</div>
             </div>
 
-            <div class="row row--2">
-              <div class="field">
-                <label>Corridas por dia (mensal)</label>
-                <input id="tripsPerDay" type="number" min="1" step="1" />
+            <div class="field">
+              <label for="destination">Destino (Lages/SC)</label>
+              <input id="destination" type="text" placeholder="Ex.: Rua Z, Bairro W" autocomplete="off">
+              <div class="hint">Dica: escreva rua + bairro. Ex.: “Av. X, Coral”.</div>
+            </div>
+
+            <div class="field monthly-only" id="monthlyRidesField">
+              <label for="ridesPerDay">Corridas por dia</label>
+              <select id="ridesPerDay">
+                <option value="1">1 (ida)</option>
+                <option value="2" selected>2 (ida e volta)</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+              </select>
+              <div class="hint">Para rotina fixa, “2” costuma ser o padrão (ida e volta).</div>
+            </div>
+
+            <div class="field monthly-only" id="monthlyDaysField">
+              <label for="daysPerMonth">Dias no mês</label>
+              <input id="daysPerMonth" type="number" min="1" max="31" value="22">
+              <div class="hint">Ex.: segunda a sexta geralmente dá 20–23 dias (varia).</div>
+            </div>
+
+            <div class="field">
+              <label for="manualKm">KM manual (opcional)</label>
+              <input id="manualKm" type="number" step="0.1" min="0" placeholder="Se quiser, informe a distância em KM">
+              <div class="hint">Se o cálculo automático falhar, você pode informar o KM manualmente.</div>
+            </div>
+
+            <div class="field full">
+              <button class="btn btn-primary btn-block" id="calcBtn">
+                Calcular orçamento
+              </button>
+              <div class="micro" id="configNote"></div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="result" id="result">
+            <div class="result-head">
+              <div>
+                <div class="result-title">Resultado</div>
+                <div class="result-subtitle" id="resultSubtitle">Preencha os campos e clique em “Calcular orçamento”.</div>
               </div>
-              <div class="field">
-                <label>Dias no mês (mensal)</label>
-                <input id="daysPerMonth" type="number" min="1" step="1" />
+              <div class="badge" id="resultBadge">Pronto</div>
+            </div>
+
+            <div class="result-grid">
+              <div class="metric">
+                <div class="metric-label">Distância estimada</div>
+                <div class="metric-value" id="kmValue">—</div>
+                <div class="metric-foot" id="kmFoot">—</div>
+              </div>
+
+              <div class="metric">
+                <div class="metric-label" id="fareLabel">Valor estimado</div>
+                <div class="metric-value" id="fareValue">—</div>
+                <div class="metric-foot" id="fareFoot">—</div>
+              </div>
+
+              <div class="metric monthly-only" id="monthlyMetric">
+                <div class="metric-label">Total mensal</div>
+                <div class="metric-value" id="monthlyValue">—</div>
+                <div class="metric-foot" id="monthlyFoot">—</div>
               </div>
             </div>
 
-            <div class="row row--2">
-              <div class="field">
-                <label>Observações (opcional)</label>
-                <input id="notes" type="text" placeholder="Ex: horário 07:30, ida e volta, espera, etc." />
-              </div>
-              <div class="field" id="manualKmWrap">
-                <label>KM manual (fallback)</label>
-                <input id="manualKm" type="number" min="0" step="0.1" placeholder="Ex: 7.2" />
-                <div class="hint">Se o cálculo automático falhar, use este campo.</div>
+            <div class="divider"></div>
+
+            <div class="terms" id="terms">
+              <div class="terms-title">Regras de pagamento</div>
+              <div class="terms-body" id="termsBody">
+                —
               </div>
             </div>
 
             <div class="actions">
-              <button class="btn btn--primary" id="btnCalc">Calcular</button>
-              <button class="btn btn--ghost" id="btnClear" type="button">Limpar</button>
+              <a class="btn btn-ghost" href="#planos">Ver planos</a>
+              <a class="btn btn-primary" href="#whatsapp" id="btnWhatsQuote">Enviar orçamento no WhatsApp</a>
             </div>
 
-            <div class="status" id="status"></div>
-          </div>
-
-          <div class="quote__result">
-            <div class="result card">
-              <div class="result__head">
-                <div>
-                  <div class="result__title">Resumo do orçamento</div>
-                  <div class="result__sub" id="resultSub">Preencha e clique em Calcular.</div>
-                </div>
-                <div class="price" id="priceMain">—</div>
-              </div>
-
-              <div class="divider"></div>
-
-              <div class="kv">
-                <div class="kv__row">
-                  <span>Distância estimada</span>
-                  <strong id="kmValue">—</strong>
-                </div>
-                <div class="kv__row">
-                  <span>Valor por corrida</span>
-                  <strong id="singleValue">—</strong>
-                </div>
-                <div class="kv__row" id="monthlyRow" style="display:none;">
-                  <span>Estimativa mensal</span>
-                  <strong id="monthlyValue">—</strong>
-                </div>
-                <div class="kv__row" id="splitRow" style="display:none;">
-                  <span>Pagamento (mensal)</span>
-                  <strong id="splitValue">—</strong>
-                </div>
-              </div>
-
-              <div class="divider"></div>
-
-              <div class="callout">
-                <strong>Regras de pagamento</strong>
-                <div class="muted" id="paymentSummary"></div>
-              </div>
-
-              <div class="result__cta">
-                <a class="btn btn--primary btn--lg" id="btnSendWhats" target="_blank" rel="noopener">Enviar no WhatsApp</a>
-                <div class="muted small">
-                  Ao clicar, uma mensagem pronta será aberta no WhatsApp com seu orçamento.
-                </div>
-              </div>
+            <div class="disclaimer">
+              Orçamento estimado baseado em distância. Valores finais podem variar conforme trânsito, espera e ajustes combinados.
             </div>
-          </div>
-        </div>
-
-        <div class="footnote">
-          <div class="muted small">
-            Observação: o cálculo automático de distância utiliza serviços públicos de mapa. Se indisponíveis, use o KM manual.
           </div>
         </div>
       </div>
     </section>
 
-    <section class="section" id="faq">
+    <!-- FAQ -->
+    <section class="section">
       <div class="container">
-        <div class="section__head">
-          <h2 id="faqTitle">Perguntas frequentes</h2>
-          <p>Para fechar rápido, com clareza total.</p>
+        <div class="section-head">
+          <h2>Perguntas frequentes</h2>
+          <p>Respostas objetivas para você decidir com segurança.</p>
         </div>
 
         <div class="faq">
-          <details class="faq__item">
-            <summary>Como funciona o plano mensal?</summary>
-            <div class="faq__content">
-              <p><strong>Pagamento:</strong> 50% antecipado e 50% ao encerrar o mês. Você agenda horários e recorrência (ex.: segunda a sexta, 07:30).</p>
+          <details class="faq-item">
+            <summary>Como funciona o pagamento no plano mensal?</summary>
+            <div class="faq-body">
+              Plano mensal: <strong>50% antecipado</strong> no fechamento e <strong>50%</strong> no fechamento do mês.
             </div>
           </details>
 
-          <details class="faq__item">
-            <summary>E se você não puder buscar em um dia?</summary>
-            <div class="faq__content">
-              <p>Em plano mensal ativo e agendado, se houver imprevisto do meu lado, eu providencio um Uber para garantir seu deslocamento (por minha conta), conforme as regras do plano.</p>
+          <details class="faq-item">
+            <summary>E se você não puder me buscar em um dia do plano?</summary>
+            <div class="faq-body">
+              Se ocorrer um imprevisto e eu não conseguir te buscar, eu <strong>providencio um Uber</strong> para você e sai por minha conta,
+              para você não ficar desamparado.
             </div>
           </details>
 
-          <details class="faq__item">
-            <summary>Corrida avulsa: como é o pagamento?</summary>
-            <div class="faq__content">
-              <p>Pagamento ao fim da corrida ou antes — fica a critério do cliente.</p>
+          <details class="faq-item">
+            <summary>O orçamento é exato?</summary>
+            <div class="faq-body">
+              Ele é <strong>estimado</strong> com base na distância. O valor final pode variar conforme condições reais (trânsito, espera e ajustes combinados).
             </div>
           </details>
 
-          <details class="faq__item">
-            <summary>Você atende fora de Lages?</summary>
-            <div class="faq__content">
-              <p>O foco é atendimento dentro de Lages/SC. Para exceções, me chame no WhatsApp.</p>
+          <details class="faq-item">
+            <summary>Atende apenas Lages?</summary>
+            <div class="faq-body">
+              Sim. Esta página foi feita para rotas <strong>dentro de Lages/SC</strong>.
             </div>
           </details>
         </div>
       </div>
     </section>
 
-    <footer class="footer">
-      <div class="container footer__inner">
-        <div class="footer__left">
-          <div class="brand brand--small">
-            <div class="brand__mark" aria-hidden="true"></div>
-            <div class="brand__text">
-              <div class="brand__name" id="brandNameFoot">João Motorista Particular</div>
-              <div class="brand__meta" id="brandMetaFoot">Lages/SC</div>
+    <!-- WHATSAPP / FECHAMENTO -->
+    <section class="section" id="whatsapp">
+      <div class="container">
+        <div class="card close-card">
+          <div class="close-left">
+            <h2>Fechar no WhatsApp</h2>
+            <p>
+              Me chame agora e eu confirmo disponibilidade, horário e as condições do seu avulso ou plano mensal.
+              Quanto mais detalhes você enviar, mais rápido eu fecho com você.
+            </p>
+
+            <div class="close-bullets">
+              <div class="bullet"><span class="bullet-dot"></span> Origem e destino</div>
+              <div class="bullet"><span class="bullet-dot"></span> Horário / dias</div>
+              <div class="bullet"><span class="bullet-dot"></span> Avulso ou mensal</div>
             </div>
           </div>
-          <div class="muted small">Atendimento por agendamento • Orçamento imediato • Planos mensais</div>
+
+          <div class="close-right">
+            <div class="contact">
+              <div class="contact-title">Contato</div>
+              <div class="contact-value" id="displayPhone">Carregando...</div>
+            </div>
+
+            <a class="btn btn-primary btn-block" id="btnWhatsMain" href="#" target="_blank" rel="noopener">
+              Chamar no WhatsApp
+            </a>
+
+            <div class="micro">
+              Atendimento conforme horários informados. Demais dias/horários: sob consulta.
+            </div>
+          </div>
         </div>
 
-        <div class="footer__right">
-          <a class="btn btn--ghost" id="btnWhatsFoot" target="_blank" rel="noopener">WhatsApp</a>
-          <a class="btn btn--primary" href="#orcamento">Orçar agora</a>
-        </div>
+        <footer class="footer">
+          <div class="footer-left">
+            <div class="footer-brand">João Motorista Particular</div>
+            <div class="footer-note">Lages/SC • Serviço particular com agendamento</div>
+          </div>
+          <div class="footer-right">
+            <a href="#orcamento">Orçamento</a>
+            <a href="#planos">Planos</a>
+            <a href="#top">Topo</a>
+          </div>
+        </footer>
       </div>
-    </footer>
+    </section>
   </main>
 
-  <script src="app.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
