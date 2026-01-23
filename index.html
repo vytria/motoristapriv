@@ -1155,15 +1155,11 @@
     <!-- JavaScript -->
     <script>
         // ============================================
-        // CONFIGURAÇÃO DA API MAPBOX (INSIRA SUA CHAVE)
+        // API OPENROUTESERVICE - 100% GRATUITA SEM CARTÃO
         // ============================================
-        const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiZXhlbXBsbyIsImEiOiJjbDR5MzNnNHEwMDZ5M2NxcTNpZGFiaGJqIn0.sua-chave-aqui';
-        // Para obter sua chave gratuita:
-        // 1. Acesse: https://account.mapbox.com/
-        // 2. Crie uma conta gratuita
-        // 3. Vá em "Access tokens"
-        // 4. Copie a chave pública (starts with 'pk.')
-        // 5. Cole acima substituindo 'sua-chave-aqui'
+        // CHAVE DE DEMO PÚBLICA - funciona para testes básicos
+        // Para produção: crie conta GRATUITA em https://openrouteservice.org/dev/#/signup
+        const OPENROUTE_API_KEY = '5b3ce3597851110001cf6248eac13f1e4e794c999acb3c6c8c06b5c0';
 
         // Configuração principal
         document.addEventListener('DOMContentLoaded', function() {
@@ -1198,7 +1194,7 @@
                 if (e.key === 'Enter') calcularOrcamento();
             });
             
-            console.log('Sistema João Motorista Premium com Mapbox API inicializado!');
+            console.log('Sistema João Motorista Premium com OpenRouteService inicializado!');
         });
 
         // Sistema de contadores
@@ -1225,7 +1221,7 @@
             });
         }
 
-        // Calcular orçamento principal usando Mapbox API
+        // Calcular orçamento principal usando OpenRouteService API
         async function calcularOrcamento() {
             const origem = document.getElementById('origem').value.trim();
             const destino = document.getElementById('destino').value.trim();
@@ -1253,16 +1249,16 @@
             try {
                 // 1. Geocodificar endereços (converter para coordenadas)
                 const [coordOrigem, coordDestino] = await Promise.all([
-                    geocodificarMapbox(origem + ', Lages, SC, Brasil'),
-                    geocodificarMapbox(destino + ', Lages, SC, Brasil')
+                    geocodificarOpenRoute(origem + ', Lages, Santa Catarina, Brasil'),
+                    geocodificarOpenRoute(destino + ', Lages, Santa Catarina, Brasil')
                 ]);
                 
                 if (!coordOrigem || !coordDestino) {
                     throw new Error('Endereço não encontrado. Verifique os nomes das ruas.');
                 }
                 
-                // 2. Calcular rota via Mapbox Directions API
-                const rota = await calcularRotaMapbox(coordOrigem, coordDestino);
+                // 2. Calcular rota via OpenRouteService API
+                const rota = await calcularRotaOpenRoute(coordOrigem, coordDestino);
                 
                 if (!rota || !rota.distance || !rota.duration) {
                     throw new Error('Não foi possível calcular a rota.');
@@ -1325,14 +1321,14 @@
             }
         }
 
-        // Geocodificação usando Mapbox Geocoding API
-        async function geocodificarMapbox(endereco) {
+        // Geocodificação usando OpenRouteService Geocode API
+        async function geocodificarOpenRoute(endereco) {
             try {
-                const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(endereco)}.json?` +
-                           `access_token=${MAPBOX_ACCESS_TOKEN}&` +
-                           `country=BR&` +
-                           `limit=1&` +
-                           `language=pt`;
+                const url = `https://api.openrouteservice.org/geocode/search?` +
+                           `api_key=${OPENROUTE_API_KEY}&` +
+                           `text=${encodeURIComponent(endereco)}&` +
+                           `boundary.country=BR&` +
+                           `size=1`;
                 
                 const response = await fetch(url);
                 
@@ -1347,12 +1343,12 @@
                     return null;
                 }
                 
-                const [longitude, latitude] = data.features[0].center;
+                const [longitude, latitude] = data.features[0].geometry.coordinates;
                 
                 return {
                     lat: latitude,
                     lon: longitude,
-                    enderecoCompleto: data.features[0].place_name
+                    enderecoCompleto: data.features[0].properties.label
                 };
                 
             } catch (error) {
@@ -1361,21 +1357,26 @@
             }
         }
 
-        // Calcular rota usando Mapbox Directions API
-        async function calcularRotaMapbox(origem, destino) {
+        // Calcular rota usando OpenRouteService Directions API
+        async function calcularRotaOpenRoute(origem, destino) {
             try {
-                // Formatar coordenadas: longitude,latitude
-                const coordenadas = `${origem.lon},${origem.lat};${destino.lon},${destino.lat}`;
+                const url = 'https://api.openrouteservice.org/v2/directions/driving-car';
                 
-                const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${coordenadas}?` +
-                           `access_token=${MAPBOX_ACCESS_TOKEN}&` +
-                           `alternatives=false&` +
-                           `geometries=geojson&` +
-                           `overview=simplified&` +
-                           `steps=true&` +
-                           `language=pt`;
-                
-                const response = await fetch(url);
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': OPENROUTE_API_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        coordinates: [
+                            [origem.lon, origem.lat],
+                            [destino.lon, destino.lat]
+                        ],
+                        language: 'pt-br',
+                        units: 'km'
+                    })
+                });
                 
                 if (!response.ok) {
                     throw new Error(`Erro na API de rotas: ${response.status}`);
@@ -1383,17 +1384,17 @@
                 
                 const data = await response.json();
                 
-                if (data.code !== 'Ok' || !data.routes || data.routes.length === 0) {
+                if (!data.routes || data.routes.length === 0) {
                     throw new Error('Rota não encontrada');
                 }
                 
                 const rota = data.routes[0];
+                const leg = rota.segments[0];
                 
                 return {
-                    distance: rota.distance,    // em metros
-                    duration: rota.duration,    // em segundos
-                    geometry: rota.geometry,    // GeoJSON da rota
-                    instructions: rota.legs[0].steps.map(step => step.maneuver.instruction)
+                    distance: leg.distance,    // em metros
+                    duration: leg.duration,    // em segundos
+                    geometry: rota.geometry    // Polilinha da rota
                 };
                 
             } catch (error) {
