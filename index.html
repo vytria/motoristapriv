@@ -1154,130 +1154,16 @@
 
     <!-- JavaScript -->
     <script>
-        // Base de dados COMPLETA de Lages (400+ ruas e bairros)
-        const todasAsRuasLages = [
-            // CENTRO (100+ ruas)
-            'Rua Benjamin Constant', 'Rua Hercílio Luz', 'Rua Coronel Córdova', 'Rua Lauro Müller',
-            'Rua Frei Gabriel', 'Rua Aristiliano Ramos', 'Rua Dom Pedro II', 'Avenida Duque de Caxias',
-            'Rua São Paulo', 'Rua Sete de Setembro', 'Rua Marechal Floriano', 'Rua Vidal Ramos',
-            'Rua Almirante Barroso', 'Rua Barão do Rio Branco', 'Rua Visconde de Mauá', 'Rua Rui Barbosa',
-            'Rua Olavo Bilac', 'Rua Castro Alves', 'Rua José do Patrocínio', 'Rua João José Godinho',
-            'Rua São José', 'Rua São Francisco', 'Rua Santa Catarina', 'Rua Santa Cruz',
-            'Rua Santa Luzia', 'Rua Santa Terezinha', 'Rua Santa Rita', 'Rua São Sebastião',
-            'Rua São Miguel', 'Rua São Rafael', 'Rua São Gabriel', 'Rua São Bento',
-            'Rua São Luiz', 'Rua São João', 'Rua São Pedro', 'Rua São Marcos',
-            'Rua São Lucas', 'Rua São Mateus', 'Rua São Cristóvão', 'Rua São Judas',
-            'Avenida Presidente Vargas', 'Avenida Belizário Ramos', 'Avenida São Francisco',
-            'Rua Presidente Nereu Ramos', 'Rua Getúlio Vargas', 'Rua Juscelino Kubitschek',
-            'Rua Marechal Deodoro', 'Rua General Osório', 'Rua Irineu Bornhausen',
-            'Rua Jorge Lacerda', 'Rua Celso Ramos', 'Rua Otacílio Costa', 'Rua Ivo Silveira',
-            
-            // BAIRRO CONTA DINHEIRO (50+ ruas)
-            'Rua Pedro Júlio Müller', 'Rua Tenente Aristiliano Ramos', 'Rua Madre Paulina',
-            'Rua Padre Anchieta', 'Rua João Goulart', 'Rua Anita Garibaldi', 'Rua Duque de Caxias',
-            'Rua Santos Dumont', 'Rua Tiradentes', 'Rua Dom Pedro I', 'Rua Princesa Isabel',
-            'Rua Mallet', 'Rua Paraná', 'Rua Santa Maria', 'Rua Rio Grande do Sul',
-            'Rua Minas Gerais', 'Rua Bahia', 'Rua Pernambuco', 'Rua Ceará', 'Rua Maranhão',
-            'Rua Goiás', 'Rua Mato Grosso', 'Rua Amazonas', 'Rua Pará', 'Rua Acre',
-            'Rua Rondônia', 'Rua Tocantins', 'Rua Sergipe', 'Rua Alagoas', 'Rua Paraíba',
-            'Rua Rio Grande do Norte', 'Rua Piauí', 'Rua Espírito Santo', 'Rua Rio de Janeiro',
-            
-            // BAIRRO HABITAÇÃO (60+ ruas)
-            'Rua João José Godinho', 'Rua José do Patrocínio', 'Rua Castro Alves',
-            'Rua Olavo Bilac', 'Rua Almirante Barroso', 'Rua Rui Barbosa', 'Rua Visconde de Mauá',
-            'Rua Barão do Rio Branco', 'Rua Machado de Assis', 'Rua Monteiro Lobato',
-            'Rua Graciliano Ramos', 'Rua Érico Veríssimo', 'Rua Jorge Amado', 'Rua Guimarães Rosa',
-            'Rua Clarice Lispector', 'Rua Carlos Drummond', 'Rua Vinícius de Moraes',
-            'Rua Cecília Meireles', 'Rua Manuel Bandeira', 'Rua Mário de Andrade',
-            'Rua Oswald de Andrade', 'Rua Lima Barreto', 'Rua Euclides da Cunha',
-            'Rua José de Alencar', 'Rua Gonçalves Dias', 'Rua Álvares de Azevedo',
-            'Rua Casimiro de Abreu', 'Rua Fagundes Varela', 'Rua Junqueira Freire',
-            'Rua Sousândrade', 'Rua Tobias Barreto', 'Rua Artur Azevedo', 'Rua Coelho Neto',
-            
-            // SÃO FRANCISCO (40+ ruas)
-            'Rua São Francisco', 'Rua São Sebastião', 'Rua São José', 'Rua Santa Catarina',
-            'Rua Santa Cruz', 'Rua Santa Luzia', 'Rua Santa Terezinha', 'Rua Santa Rita',
-            'Rua Santa Helena', 'Rua Santa Edwiges', 'Rua Santa Mônica', 'Rua Santa Isabel',
-            'Rua Santa Thereza', 'Rua Santa Lúcia', 'Rua Santa Cecília', 'Rua Santa Amélia',
-            'Rua Santa Júlia', 'Rua Santa Efigênia', 'Rua Santa Rosa', 'Rua Santa Fé',
-            'Rua Santa Maria', 'Rua Santa Bárbara', 'Rua Santa Clara', 'Rua Santa Inês',
-            'Rua Santa Ângela', 'Rua Santa Margarida', 'Rua Santa Genoveva', 'Rua Santa Marta',
-            
-            // SANTA CLARA (30+ ruas)
-            'Rua Santa Clara', 'Rua São João', 'Rua São Pedro', 'Rua São Marcos',
-            'Rua São Lucas', 'Rua São Mateus', 'Rua São Tomé', 'Rua São Felipe',
-            'Rua São Tiago', 'Rua São Bartolomeu', 'Rua São Simão', 'Rua São Judas Tadeu',
-            'Rua São Matias', 'Rua São Barnabé', 'Rua São Silas', 'Rua São Timóteo',
-            'Rua São Tito', 'Rua São Filemom', 'Rua São Epafras', 'Rua São Aristarco',
-            
-            // COPA (20+ ruas)
-            'Rua Copacabana', 'Rua Ipanema', 'Rua Leblon', 'Rua Botafogo', 'Rua Flamengo',
-            'Rua Tijuca', 'Rua Laranjeiras', 'Rua Cosme Velho', 'Rua Santa Teresa',
-            'Rua Urca', 'Rua Leme', 'Rua Barra da Tijuca', 'Rua Recreio', 'Rua Jacarepaguá',
-            'Rua Madureira', 'Rua Méier', 'Rua Tijuca', 'Rua Maracanã', 'Rua São Cristóvão',
-            
-            // BAIRROS ADICIONAIS (150+ ruas)
-            'Rua Caroba', 'Rua Ipê', 'Rua Jacarandá', 'Rua Cedro', 'Rua Bracatinga',
-            'Rua Araucária', 'Rua Pinheiro', 'Rua Eucalipto', 'Rua Figueira', 'Rua Goiabeira',
-            'Rua Laranjeira', 'Rua Pereira', 'Rua Macieira', 'Rua Amendoeira', 'Rua Nogueira',
-            'Rua Carvalho', 'Rua Canela', 'Rua Imbuia', 'Rua Paineira', 'Rua Sibipiruna',
-            
-            'Rua Petrópolis', 'Rua Florianópolis', 'Rua Porto Alegre', 'Rua Curitiba',
-            'Rua São Paulo', 'Rua Rio de Janeiro', 'Rua Belo Horizonte', 'Rua Salvador',
-            'Rua Recife', 'Rua Fortaleza', 'Rua Brasília', 'Rua Manaus', 'Rua Belém',
-            'Rua Goiânia', 'Rua Cuiabá', 'Rua Campo Grande', 'Rua Natal', 'Rua João Pessoa',
-            'Rua Maceió', 'Rua Aracaju', 'Rua Teresina', 'Rua Vitória',
-            
-            'Rua Universitária', 'Rua dos Estudantes', 'Rua da Cultura', 'Rua do Conhecimento',
-            'Rua da Sabedoria', 'Rua da Ciência', 'Rua da Filosofia', 'Rua da História',
-            'Rua da Matemática', 'Rua da Física', 'Rua da Química', 'Rua da Biologia',
-            'Rua da Medicina', 'Rua da Engenharia', 'Rua da Arquitetura', 'Rua do Direito',
-            
-            'Rua das Flores', 'Rua das Hortênsias', 'Rua das Azaleias', 'Rua das Rosas',
-            'Rua das Margaridas', 'Rua das Orquídeas', 'Rua das Violetas', 'Rua das Begônias',
-            'Rua das Gardênias', 'Rua das Camélias', 'Rua das Dálias', 'Rua das Tulipas',
-            'Rua das Crisântemos', 'Rua das Magnólias', 'Rua das Alamandas', 'Rua das Buganvílias',
-            
-            'Rua Alfa', 'Rua Beta', 'Rua Gama', 'Rua Delta', 'Rua Épsilon', 'Rua Zeta',
-            'Rua Eta', 'Rua Teta', 'Rua Iota', 'Rua Capa', 'Rua Lambda', 'Rua Mi',
-            'Rua Ni', 'Rua Csi', 'Rua Ômicron', 'Rua Pi', 'Rua Rô', 'Rua Sigma',
-            'Rua Tau', 'Rua Úpsilon', 'Rua Fi', 'Rua Qui', 'Rua Psi', 'Rua Ômega',
-            
-            // PONTOS DE REFERÊNCIA
-            'Shopping Center', 'Lages Garden Shopping', 'Praça João Costa', 'Praça da Bandeira',
-            'Terminal Rodoviário', 'Unoesc', 'Uniplac', 'Hospital', 'Prefeitura Municipal',
-            'Fórum', 'Mercado Público', 'Parque Jonas Ramos (Tanque)', 'Catedral',
-            'Teatro Marajoara', 'Museu Histórico', 'Sesc', 'Sesi', 'Banco do Brasil',
-            'Caixa Econômica', 'Bradesco', 'Itaú', 'Santander', 'Posto de Saúde',
-            'Delegacia', 'Corpo de Bombeiros', 'Polícia Militar',
-            
-            // BAIRROS (para pesquisa)
-            'Centro', 'Centro Cívico', 'Conta Dinheiro', 'Habitação', 'São Francisco',
-            'Santa Clara', 'Copacabana', 'Gethal', 'Caroba', 'Petrópolis', 'Universitário',
-            'São Cristóvão', 'Promorar', 'Triângulo', 'São Paulo', 'São Pedro',
-            'Santa Maria', 'Santa Helena', 'Bom Jesus', 'Sagrado Coração', 'Nossa Senhora Aparecida',
-            'Frei Rogério', 'São Miguel', 'Coral', 'Vila Comboni', 'Vila Nova',
-            'Jardim das Camélias', 'Jardim do Lago', 'Jardim Itália', 'Jardim Europa',
-            'Jardim América', 'Jardim São Paulo', 'Jardim Primavera', 'Jardim Verona'
-        ];
-
-        // Mapa de distâncias entre bairros principais (para fallback)
-        const distanciasBairros = {
-            'Centro-Conta Dinheiro': 3.2,
-            'Centro-Habitação': 4.5,
-            'Centro-São Francisco': 2.8,
-            'Centro-Santa Clara': 5.2,
-            'Centro-Copacabana': 4.0,
-            'Centro-Gethal': 6.3,
-            'Centro-Caroba': 7.1,
-            'Conta Dinheiro-Habitação': 3.8,
-            'Conta Dinheiro-São Francisco': 2.5,
-            'Habitação-São Francisco': 3.2,
-            'Habitação-Santa Clara': 2.9,
-            'São Francisco-Santa Clara': 4.1,
-            'São Francisco-Copacabana': 3.7,
-            'Santa Clara-Copacabana': 5.4
-        };
+        // ============================================
+        // CONFIGURAÇÃO DA API MAPBOX (INSIRA SUA CHAVE)
+        // ============================================
+        const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiZXhlbXBsbyIsImEiOiJjbDR5MzNnNHEwMDZ5M2NxcTNpZGFiaGJqIn0.sua-chave-aqui';
+        // Para obter sua chave gratuita:
+        // 1. Acesse: https://account.mapbox.com/
+        // 2. Crie uma conta gratuita
+        // 3. Vá em "Access tokens"
+        // 4. Copie a chave pública (starts with 'pk.')
+        // 5. Cole acima substituindo 'sua-chave-aqui'
 
         // Configuração principal
         document.addEventListener('DOMContentLoaded', function() {
@@ -1286,10 +1172,6 @@
             const tipoServicoRadios = document.querySelectorAll('input[name="tipo-servico"]');
             const mensalOptions = document.getElementById('mensal-options');
             const calcularBtn = document.getElementById('calcular-btn');
-            
-            // Configurar autocomplete
-            configurarAutocomplete(origemInput, 'sugestoes-origem');
-            configurarAutocomplete(destinoInput, 'sugestoes-destino');
             
             // Mostrar/ocultar opções mensais
             tipoServicoRadios.forEach(radio => {
@@ -1316,51 +1198,8 @@
                 if (e.key === 'Enter') calcularOrcamento();
             });
             
-            console.log('Sistema João Motorista Premium inicializado!');
+            console.log('Sistema João Motorista Premium com Mapbox API inicializado!');
         });
-
-        // Sistema de autocomplete inteligente
-        function configurarAutocomplete(input, sugestoesId) {
-            const sugestoes = document.getElementById(sugestoesId);
-            
-            input.addEventListener('input', function() {
-                const valor = this.value.toLowerCase().trim();
-                
-                if (valor.length < 2) {
-                    sugestoes.style.display = 'none';
-                    return;
-                }
-                
-                // Buscar correspondências
-                const matches = todasAsRuasLages.filter(rua => 
-                    rua.toLowerCase().includes(valor)
-                ).slice(0, 10);
-                
-                if (matches.length > 0) {
-                    sugestoes.innerHTML = matches.map(rua => 
-                        `<div class="autocomplete-item" data-value="${rua}">${rua}</div>`
-                    ).join('');
-                    sugestoes.style.display = 'block';
-                    
-                    // Adicionar evento de clique
-                    sugestoes.querySelectorAll('.autocomplete-item').forEach(item => {
-                        item.addEventListener('click', function() {
-                            input.value = this.getAttribute('data-value');
-                            sugestoes.style.display = 'none';
-                        });
-                    });
-                } else {
-                    sugestoes.style.display = 'none';
-                }
-            });
-            
-            // Fechar ao clicar fora
-            document.addEventListener('click', function(e) {
-                if (!input.contains(e.target) && !sugestoes.contains(e.target)) {
-                    sugestoes.style.display = 'none';
-                }
-            });
-        }
 
         // Sistema de contadores
         function configurarContador(tipo, valorInicial, min, max) {
@@ -1384,11 +1223,9 @@
                     valorElement.textContent = valor;
                 }
             });
-            
-            return function() { return valor; };
         }
 
-        // Calcular orçamento principal
+        // Calcular orçamento principal usando Mapbox API
         async function calcularOrcamento() {
             const origem = document.getElementById('origem').value.trim();
             const destino = document.getElementById('destino').value.trim();
@@ -1414,21 +1251,37 @@
             calcularBtn.disabled = true;
             
             try {
-                // Calcular distância
-                const distancia = await calcularDistancia(origem, destino);
+                // 1. Geocodificar endereços (converter para coordenadas)
+                const [coordOrigem, coordDestino] = await Promise.all([
+                    geocodificarMapbox(origem + ', Lages, SC, Brasil'),
+                    geocodificarMapbox(destino + ', Lages, SC, Brasil')
+                ]);
                 
-                // Calcular valores
+                if (!coordOrigem || !coordDestino) {
+                    throw new Error('Endereço não encontrado. Verifique os nomes das ruas.');
+                }
+                
+                // 2. Calcular rota via Mapbox Directions API
+                const rota = await calcularRotaMapbox(coordOrigem, coordDestino);
+                
+                if (!rota || !rota.distance || !rota.duration) {
+                    throw new Error('Não foi possível calcular a rota.');
+                }
+                
+                // Converter metros para km e segundos para minutos
+                const distanciaKm = rota.distance / 1000;
+                const tempoMinutos = Math.round(rota.duration / 60);
+                
+                // 3. Calcular valores
                 const precoPorKm = 2.00; // Valor interno, não mostrado
                 const taxaMinima = 5.00; // Taxa mínima de R$ 5,00
                 
-                let valorPorCorrida = distancia * precoPorKm;
+                let valorPorCorrida = distanciaKm * precoPorKm;
                 
                 // Aplicar taxa mínima
                 if (valorPorCorrida < taxaMinima) {
                     valorPorCorrida = taxaMinima;
                 }
-                
-                const tempoEstimado = Math.round((distancia / 35) * 60); // 35km/h média
                 
                 let corridasPorMes = 0;
                 let valorTotal = valorPorCorrida;
@@ -1438,9 +1291,9 @@
                     valorTotal = valorPorCorrida * corridasPorMes;
                 }
                 
-                // Atualizar interface
-                document.getElementById('distancia').textContent = `${distancia.toFixed(1)} km`;
-                document.getElementById('tempo').textContent = `${tempoEstimado} min`;
+                // 4. Atualizar interface
+                document.getElementById('distancia').textContent = `${distanciaKm.toFixed(1)} km`;
+                document.getElementById('tempo').textContent = `${tempoMinutos} min`;
                 document.getElementById('valor-corrida').textContent = `R$ ${valorPorCorrida.toFixed(2)}`;
                 
                 if (isMensal) {
@@ -1449,11 +1302,12 @@
                 
                 document.getElementById('valor-total').textContent = `R$ ${valorTotal.toFixed(2)}`;
                 
-                // Atualizar link do WhatsApp
+                // 5. Atualizar link do WhatsApp
                 const mensagem = `Olá João! Gostaria de orçar uma corrida:\n` +
                                 `📍 *Origem:* ${origem}\n` +
                                 `🏁 *Destino:* ${destino}\n` +
-                                `📏 *Distância:* ${distancia.toFixed(1)} km\n` +
+                                `📏 *Distância:* ${distanciaKm.toFixed(1)} km\n` +
+                                `⏱️ *Tempo estimado:* ${tempoMinutos} min\n` +
                                 `💰 *Valor ${isMensal ? 'Mensal' : 'da Corrida'}:* R$ ${valorTotal.toFixed(2)}\n` +
                                 (isMensal ? `📅 *Frequência:* ${corridasPorMes} corridas/mês\n` : '') +
                                 `\nPodemos agendar?`;
@@ -1463,7 +1317,7 @@
                 
             } catch (error) {
                 console.error('Erro:', error);
-                alert('Não foi possível calcular a distância. Por favor, verifique os endereços ou entre em contato diretamente.');
+                alert('Erro: ' + error.message + '\n\nVerifique se os endereços estão corretos ou entre em contato diretamente.');
             } finally {
                 // Restaurar botão
                 calcularBtn.innerHTML = originalText;
@@ -1471,123 +1325,87 @@
             }
         }
 
-        // Algoritmo inteligente de cálculo de distância
-        async function calcularDistancia(origem, destino) {
-            // 1. Tentar cálculo via API (se disponível)
+        // Geocodificação usando Mapbox Geocoding API
+        async function geocodificarMapbox(endereco) {
             try {
-                const distanciaAPI = await calcularViaAPI(origem, destino);
-                if (distanciaAPI) return distanciaAPI;
-            } catch (e) {
-                console.log('API não disponível, usando cálculo local');
-            }
-            
-            // 2. Cálculo local inteligente
-            return calcularDistanciaLocal(origem, destino);
-        }
-
-        // Cálculo via API (OpenStreetMap Nominatim)
-        async function calcularViaAPI(origem, destino) {
-            try {
-                // Geocodificação dos endereços
-                const [coordOrigem, coordDestino] = await Promise.all([
-                    geocodificar(origem + ', Lages, SC, Brasil'),
-                    geocodificar(destino + ', Lages, SC, Brasil')
-                ]);
+                const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(endereco)}.json?` +
+                           `access_token=${MAPBOX_ACCESS_TOKEN}&` +
+                           `country=BR&` +
+                           `limit=1&` +
+                           `language=pt`;
                 
-                if (!coordOrigem || !coordDestino) {
-                    throw new Error('Endereço não encontrado');
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`Erro na API: ${response.status}`);
                 }
                 
-                // Cálculo da distância (fórmula de Haversine)
-                const distancia = calcularDistanciaHaversine(coordOrigem, coordDestino);
+                const data = await response.json();
                 
-                // Adicionar fator urbano (rotas não são linha reta)
-                return distancia * 1.3;
+                if (!data.features || data.features.length === 0) {
+                    console.warn('Endereço não encontrado:', endereco);
+                    return null;
+                }
+                
+                const [longitude, latitude] = data.features[0].center;
+                
+                return {
+                    lat: latitude,
+                    lon: longitude,
+                    enderecoCompleto: data.features[0].place_name
+                };
                 
             } catch (error) {
-                console.warn('Erro no cálculo via API:', error);
+                console.error('Erro na geocodificação:', error);
                 return null;
             }
         }
 
-        // Geocodificação simplificada
-        async function geocodificar(endereco) {
-            // Mapeamento de coordenadas aproximadas por bairro/rua
-            const coordenadasBase = {
-                // Centro de Lages
-                'lat': -27.8160,
-                'lon': -50.3269
-            };
-            
-            // Retorna coordenadas base com pequena variação
-            return {
-                lat: coordenadasBase.lat + (Math.random() * 0.02 - 0.01),
-                lon: coordenadasBase.lon + (Math.random() * 0.02 - 0.01)
-            };
-        }
-
-        // Fórmula de Haversine para distância entre coordenadas
-        function calcularDistanciaHaversine(coord1, coord2) {
-            const R = 6371; // Raio da Terra em km
-            const dLat = (coord2.lat - coord1.lat) * Math.PI / 180;
-            const dLon = (coord2.lon - coord1.lon) * Math.PI / 180;
-            
-            const a = 
-                Math.sin(dLat/2) * Math.sin(dLat/2) +
-                Math.cos(coord1.lat * Math.PI / 180) * Math.cos(coord2.lat * Math.PI / 180) *
-                Math.sin(dLon/2) * Math.sin(dLon/2);
-            
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c;
-        }
-
-        // Cálculo local inteligente
-        function calcularDistanciaLocal(origem, destino) {
-            const origemLower = origem.toLowerCase();
-            const destinoLower = destino.toLowerCase();
-            
-            // Tentar encontrar distância direta no mapa
-            for (const [rota, distancia] of Object.entries(distanciasBairros)) {
-                const [bairro1, bairro2] = rota.split('-');
+        // Calcular rota usando Mapbox Directions API
+        async function calcularRotaMapbox(origem, destino) {
+            try {
+                // Formatar coordenadas: longitude,latitude
+                const coordenadas = `${origem.lon},${origem.lat};${destino.lon},${destino.lat}`;
                 
-                if ((origemLower.includes(bairro1.toLowerCase()) || origemLower.includes(bairro2.toLowerCase())) &&
-                    (destinoLower.includes(bairro1.toLowerCase()) || destinoLower.includes(bairro2.toLowerCase()))) {
-                    return distancia;
+                const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${coordenadas}?` +
+                           `access_token=${MAPBOX_ACCESS_TOKEN}&` +
+                           `alternatives=false&` +
+                           `geometries=geojson&` +
+                           `overview=simplified&` +
+                           `steps=true&` +
+                           `language=pt`;
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`Erro na API de rotas: ${response.status}`);
                 }
+                
+                const data = await response.json();
+                
+                if (data.code !== 'Ok' || !data.routes || data.routes.length === 0) {
+                    throw new Error('Rota não encontrada');
+                }
+                
+                const rota = data.routes[0];
+                
+                return {
+                    distance: rota.distance,    // em metros
+                    duration: rota.duration,    // em segundos
+                    geometry: rota.geometry,    // GeoJSON da rota
+                    instructions: rota.legs[0].steps.map(step => step.maneuver.instruction)
+                };
+                
+            } catch (error) {
+                console.error('Erro no cálculo da rota:', error);
+                throw error;
             }
-            
-            // Distância base por similaridade de texto
-            const similaridade = calcularSimilaridade(origemLower, destinoLower);
-            
-            // Se endereços parecidos (mesmo bairro), distância curta
-            if (similaridade > 0.7) {
-                return 1.5 + Math.random() * 2; // 1.5-3.5km
-            }
-            
-            // Distância média para endereços diferentes
-            return 4.5 + Math.random() * 5; // 4.5-9.5km
         }
 
-        // Algoritmo de similaridade de texto (Levenshtein simplificado)
-        function calcularSimilaridade(str1, str2) {
-            const longer = str1.length > str2.length ? str1 : str2;
-            const shorter = str1.length > str2.length ? str2 : str1;
-            
-            if (longer.length === 0) return 1.0;
-            
-            // Contar palavras em comum
-            const palavras1 = str1.split(/[ ,.-]+/).filter(Boolean);
-            const palavras2 = str2.split(/[ ,.-]+/).filter(Boolean);
-            
-            let comum = 0;
-            palavras1.forEach(palavra1 => {
-                if (palavras2.some(palavra2 => 
-                    palavra2.includes(palavra1) || palavra1.includes(palavra2))) {
-                    comum++;
-                }
-            });
-            
-            return comum / Math.max(palavras1.length, palavras2.length);
+        // Função de fallback caso a API falhe (mantida por segurança)
+        async function calcularDistanciaFallback(origem, destino) {
+            // Distância média estimada para Lages
+            return 4.5 + Math.random() * 5; // 4.5-9.5km
         }
     </script>
 </body>
