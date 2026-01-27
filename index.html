@@ -1266,6 +1266,19 @@
             const hojeFormatado = hoje.toISOString().split('T')[0];
             dataInput.min = hojeFormatado;
             
+            // Bloquear sextas, sábados e domingos no calendário
+            dataInput.addEventListener('focus', function() {
+                this.type = 'date';
+            });
+            
+            dataInput.addEventListener('blur', function() {
+                this.type = 'text';
+            });
+            
+            dataInput.addEventListener('input', function() {
+                validarDataCorrida();
+            });
+            
             // Mostrar/ocultar opções mensais
             tipoServicoRadios.forEach(radio => {
                 radio.addEventListener('change', function() {
@@ -1306,11 +1319,6 @@
             // Auto-sugestões para origem e destino
             configurarAutocomplete('origem');
             configurarAutocomplete('destino');
-            
-            // Validar data para aceitar apenas Segunda a Quinta
-            dataInput.addEventListener('change', function() {
-                validarDataCorrida();
-            });
         });
 
         // Sistema de contadores
@@ -1343,7 +1351,8 @@
             const data = new Date(dataInput.value);
             const diaSemana = data.getDay(); // 0=Domingo, 1=Segunda, ..., 6=Sábado
             
-            if (diaSemana === 0 || diaSemana === 5 || diaSemana === 6) { // Domingo, Sexta, Sábado
+            // Verificar se é Sexta (5), Sábado (6) ou Domingo (0)
+            if (diaSemana === 0 || diaSemana === 5 || diaSemana === 6) {
                 mostrarErroModal('ATENÇÃO: Corridas disponíveis apenas de Segunda a Quinta-feira.\n\nPor favor, selecione uma data entre Segunda e Quinta.');
                 dataInput.value = '';
                 return false;
