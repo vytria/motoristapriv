@@ -1360,12 +1360,8 @@
                     const precoPorKm = 2.00;
                     const taxaMinima = 5.00;
                     
-                    let valorPorCorrida = distanciaKm * precoPorKm;
+                    let valorPorCorrida = (distanciaKm * precoPorKm) + taxaMinima;
                     
-                    // Aplicar taxa mínima
-                    if (valorPorCorrida < taxaMinima) {
-                        valorPorCorrida = taxaMinima;
-                    }
                     
                     let corridasPorMes = 0;
                     let valorTotal = valorPorCorrida;
