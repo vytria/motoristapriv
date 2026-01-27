@@ -778,6 +778,50 @@
                 padding: 2rem;
             }
         }
+
+        /* ESTILOS PARA O SELECTOR DE DATA PERSONALIZADO */
+        .week-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .day-button {
+            flex: 1;
+            padding: 0.75rem 0.5rem;
+            border: 2px solid var(--gray-300);
+            border-radius: var(--radius);
+            background: white;
+            color: var(--gray-700);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .day-button:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .day-button.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .day-button.disabled {
+            background: var(--gray-100);
+            color: var(--gray-400);
+            cursor: not-allowed;
+            border-color: var(--gray-200);
+        }
+
+        .day-button.disabled:hover {
+            border-color: var(--gray-200);
+            color: var(--gray-400);
+        }
     </style>
 </head>
 <body>
@@ -956,12 +1000,21 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">
-                                <i class="fas fa-calendar-day"></i> Data da Corrida
+                                <i class="fas fa-calendar-day"></i> Selecionar Dia da Semana
                             </label>
-                            <input type="date" class="form-input" id="data-corrida" 
-                                   min="2024-01-01">
+                            <div class="week-selector">
+                                <button type="button" class="day-button" data-day="1">Segunda</button>
+                                <button type="button" class="day-button" data-day="2">Terça</button>
+                                <button type="button" class="day-button" data-day="3">Quarta</button>
+                                <button type="button" class="day-button" data-day="4">Quinta</button>
+                                <button type="button" class="day-button disabled" data-day="5" disabled>Sexta</button>
+                                <button type="button" class="day-button disabled" data-day="6" disabled>Sábado</button>
+                                <button type="button" class="day-button disabled" data-day="0" disabled>Domingo</button>
+                            </div>
+                            <input type="hidden" id="dia-semana" value="">
+                            <input type="hidden" id="data-corrida" value="">
                             <p style="font-size: 0.875rem; color: var(--gray-700); margin-top: 0.5rem;">
-                                Somente de Segunda a Quinta-feira
+                                Selecione o dia da semana da corrida (apenas Segunda a Quinta)
                             </p>
                         </div>
                         
@@ -1051,7 +1104,7 @@
                         </div>
                         
                         <div class="resultado-item">
-                            <span class="resultado-label">Data e Horário:</span>
+                            <span class="resultado-label">Dia e Horário:</span>
                             <span class="resultado-valor" id="data-horario-display">--</span>
                         </div>
                         
@@ -1258,26 +1311,8 @@
             const tipoServicoRadios = document.querySelectorAll('input[name="tipo-servico"]');
             const mensalOptions = document.getElementById('mensal-options');
             const calcularBtn = document.getElementById('calcular-btn');
-            const dataInput = document.getElementById('data-corrida');
             const horarioSelect = document.getElementById('horario-corrida');
-            
-            // Definir data mínima como hoje
-            const hoje = new Date();
-            const hojeFormatado = hoje.toISOString().split('T')[0];
-            dataInput.min = hojeFormatado;
-            
-            // Bloquear sextas, sábados e domingos no calendário
-            dataInput.addEventListener('focus', function() {
-                this.type = 'date';
-            });
-            
-            dataInput.addEventListener('blur', function() {
-                this.type = 'text';
-            });
-            
-            dataInput.addEventListener('input', function() {
-                validarDataCorrida();
-            });
+            const dayButtons = document.querySelectorAll('.day-button:not(.disabled)');
             
             // Mostrar/ocultar opções mensais
             tipoServicoRadios.forEach(radio => {
@@ -1296,6 +1331,33 @@
             // Configurar contadores
             configurarContador('dias', 5, 1, 7);
             configurarContador('semanas', 4, 1, 4);
+            
+            // Sistema de seleção de dias
+            dayButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remover seleção de todos os botões
+                    dayButtons.forEach(btn => {
+                        btn.classList.remove('selected');
+                    });
+                    
+                    // Adicionar seleção ao botão clicado
+                    this.classList.add('selected');
+                    
+                    // Salvar o valor do dia
+                    const diaSemana = this.getAttribute('data-day');
+                    document.getElementById('dia-semana').value = diaSemana;
+                    
+                    // Calcular a próxima data para esse dia da semana
+                    const dataCalculada = calcularProximaDataParaDiaSemana(parseInt(diaSemana));
+                    document.getElementById('data-corrida').value = dataCalculada.toISOString().split('T')[0];
+                });
+            });
+            
+            // Selecionar automaticamente Segunda-feira como padrão
+            const segundaButton = document.querySelector('.day-button[data-day="1"]');
+            if (segundaButton) {
+                segundaButton.click();
+            }
             
             // Calcular orçamento
             calcularBtn.addEventListener('click', calcularOrcamento);
@@ -1321,6 +1383,30 @@
             configurarAutocomplete('destino');
         });
 
+        // Calcular a próxima data para um dia específico da semana
+        function calcularProximaDataParaDiaSemana(diaDesejado) {
+            const hoje = new Date();
+            const diasDaSemana = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+            
+            let dataCalculada = new Date(hoje);
+            let diaAtual = dataCalculada.getDay();
+            
+            // Se hoje já é o dia desejado, usar hoje
+            // Se não, calcular o próximo dia desejado
+            if (diaAtual === diaDesejado) {
+                return dataCalculada;
+            } else {
+                // Calcular quantos dias até o próximo dia desejado
+                let diasParaAdicionar = diaDesejado - diaAtual;
+                if (diasParaAdicionar < 0) {
+                    diasParaAdicionar += 7;
+                }
+                
+                dataCalculada.setDate(dataCalculada.getDate() + diasParaAdicionar);
+                return dataCalculada;
+            }
+        }
+
         // Sistema de contadores
         function configurarContador(tipo, valorInicial, min, max) {
             const valorElement = document.getElementById(`${tipo}-value`);
@@ -1345,22 +1431,6 @@
             });
         }
 
-        // Validar data (apenas Segunda a Quinta)
-        function validarDataCorrida() {
-            const dataInput = document.getElementById('data-corrida');
-            const data = new Date(dataInput.value);
-            const diaSemana = data.getDay(); // 0=Domingo, 1=Segunda, ..., 6=Sábado
-            
-            // Verificar se é Sexta (5), Sábado (6) ou Domingo (0)
-            if (diaSemana === 0 || diaSemana === 5 || diaSemana === 6) {
-                mostrarErroModal('ATENÇÃO: Corridas disponíveis apenas de Segunda a Quinta-feira.\n\nPor favor, selecione uma data entre Segunda e Quinta.');
-                dataInput.value = '';
-                return false;
-            }
-            
-            return true;
-        }
-
         // Função principal de cálculo
         function calcularOrcamento() {
             const origem = document.getElementById('origem').value.trim();
@@ -1369,7 +1439,7 @@
             const isMensal = document.querySelector('input[name="tipo-servico"]:checked').value === 'mensal';
             const diasPorSemana = parseInt(document.getElementById('dias-value').textContent);
             const semanasPorMes = parseInt(document.getElementById('semanas-value').textContent);
-            const dataCorrida = document.getElementById('data-corrida').value;
+            const diaSemanaSelecionado = document.getElementById('dia-semana').value;
             const horarioCorrida = document.getElementById('horario-corrida').value;
             
             // Validação
@@ -1388,16 +1458,8 @@
                 return;
             }
             
-            if (!dataCorrida) {
-                mostrarErroModal('Por favor, selecione uma data para a corrida.');
-                return;
-            }
-            
-            // Validar dia da semana (apenas Segunda a Quinta)
-            const dataObj = new Date(dataCorrida);
-            const diaSemana = dataObj.getDay();
-            if (diaSemana === 0 || diaSemana === 5 || diaSemana === 6) {
-                mostrarErroModal('ATENÇÃO: Corridas disponíveis apenas de Segunda a Quinta-feira.\n\nPor favor, selecione uma data entre Segunda e Quinta.');
+            if (!diaSemanaSelecionado) {
+                mostrarErroModal('Por favor, selecione um dia da semana para a corrida.');
                 return;
             }
             
@@ -1431,14 +1493,16 @@
                     }
                     
                     // Formatar data para exibição
-                    const dataFormatada = dataObj.toLocaleDateString('pt-BR');
+                    const diaSemanaNumero = parseInt(diaSemanaSelecionado);
+                    const nomesDias = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+                    const nomeDia = nomesDias[diaSemanaNumero];
                     
                     // Atualizar interface
                     document.getElementById('origem-display').textContent = origem;
                     document.getElementById('destino-display').textContent = destino;
                     document.getElementById('distancia-display').textContent = `${distanciaKm.toFixed(1)} km`;
                     document.getElementById('valor-corrida').textContent = `R$ ${valorPorCorrida.toFixed(2)}`;
-                    document.getElementById('data-horario-display').textContent = `${dataFormatada} às ${horarioCorrida}`;
+                    document.getElementById('data-horario-display').textContent = `${nomeDia} às ${horarioCorrida}`;
                     
                     if (isMensal) {
                         document.getElementById('total-corridas').textContent = corridasPorMes;
@@ -1461,7 +1525,7 @@
                                     `"Km": ${distanciaKm.toFixed(1)}\n` +
                                     `"${tipoServicoTexto}"` +
                                     `${corridasMesTexto}\n` +
-                                    `"Data": ${dataFormatada}\n` +
+                                    `"Dia": ${nomeDia}\n` +
                                     `"Horário": ${horarioCorrida}\n\n` +
                                     `Valor total: R$ ${valorTotal.toFixed(2)}\n\n` +
                                     `Está disponível para me atender?`;
