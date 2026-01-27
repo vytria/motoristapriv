@@ -960,6 +960,9 @@
                             </label>
                             <input type="date" class="form-input" id="data-corrida" 
                                    min="2024-01-01">
+                            <p style="font-size: 0.875rem; color: var(--gray-700); margin-top: 0.5rem;">
+                                Somente de Segunda a Quinta-feira
+                            </p>
                         </div>
                         
                         <div class="form-group">
@@ -968,28 +971,47 @@
                             </label>
                             <select class="form-input" id="horario-corrida">
                                 <option value="">Selecione um horário</option>
+                                <!-- Manhã: 05:00 às 07:40 -->
                                 <option value="05:00">05:00</option>
+                                <option value="05:15">05:15</option>
                                 <option value="05:30">05:30</option>
+                                <option value="05:45">05:45</option>
                                 <option value="06:00">06:00</option>
+                                <option value="06:15">06:15</option>
                                 <option value="06:30">06:30</option>
+                                <option value="06:45">06:45</option>
                                 <option value="07:00">07:00</option>
+                                <option value="07:15">07:15</option>
                                 <option value="07:30">07:30</option>
-                                <option value="08:00">08:00</option>
-                                <option value="12:00">12:00</option>
+                                <option value="07:40">07:40</option>
+                                <!-- Almoço: 12:15 às 13:15 -->
+                                <option value="12:15">12:15</option>
                                 <option value="12:30">12:30</option>
+                                <option value="12:45">12:45</option>
                                 <option value="13:00">13:00</option>
-                                <option value="13:30">13:30</option>
-                                <option value="17:30">17:30</option>
+                                <option value="13:15">13:15</option>
+                                <!-- Tarde/Noite: 17:40 às 23:00 -->
+                                <option value="17:40">17:40</option>
                                 <option value="18:00">18:00</option>
+                                <option value="18:15">18:15</option>
                                 <option value="18:30">18:30</option>
+                                <option value="18:45">18:45</option>
                                 <option value="19:00">19:00</option>
+                                <option value="19:15">19:15</option>
                                 <option value="19:30">19:30</option>
+                                <option value="19:45">19:45</option>
                                 <option value="20:00">20:00</option>
+                                <option value="20:15">20:15</option>
                                 <option value="20:30">20:30</option>
+                                <option value="20:45">20:45</option>
                                 <option value="21:00">21:00</option>
+                                <option value="21:15">21:15</option>
                                 <option value="21:30">21:30</option>
+                                <option value="21:45">21:45</option>
                                 <option value="22:00">22:00</option>
+                                <option value="22:15">22:15</option>
                                 <option value="22:30">22:30</option>
+                                <option value="22:45">22:45</option>
                                 <option value="23:00">23:00</option>
                             </select>
                         </div>
@@ -1198,9 +1220,9 @@
                         <div>
                             <h4 style="color: var(--gray-700); margin-bottom: 0.5rem;">Segunda a Quinta</h4>
                             <p style="color: var(--gray-700); font-size: 0.875rem;">
-                                <strong>Manhã:</strong> 05:00 às 08:00<br>
-                                <strong>Almoço:</strong> 12:00 às 13:30<br>
-                                <strong>Tarde/Noite:</strong> 17:30 às 23:00
+                                <strong>Manhã:</strong> 05:00 às 07:40<br>
+                                <strong>Almoço:</strong> 12:15 às 13:15<br>
+                                <strong>Tarde/Noite:</strong> 17:40 às 23:00
                             </p>
                         </div>
                         <div>
@@ -1284,6 +1306,11 @@
             // Auto-sugestões para origem e destino
             configurarAutocomplete('origem');
             configurarAutocomplete('destino');
+            
+            // Validar data para aceitar apenas Segunda a Quinta
+            dataInput.addEventListener('change', function() {
+                validarDataCorrida();
+            });
         });
 
         // Sistema de contadores
@@ -1308,6 +1335,21 @@
                     valorElement.textContent = valor;
                 }
             });
+        }
+
+        // Validar data (apenas Segunda a Quinta)
+        function validarDataCorrida() {
+            const dataInput = document.getElementById('data-corrida');
+            const data = new Date(dataInput.value);
+            const diaSemana = data.getDay(); // 0=Domingo, 1=Segunda, ..., 6=Sábado
+            
+            if (diaSemana === 0 || diaSemana === 5 || diaSemana === 6) { // Domingo, Sexta, Sábado
+                mostrarErroModal('ATENÇÃO: Corridas disponíveis apenas de Segunda a Quinta-feira.\n\nPor favor, selecione uma data entre Segunda e Quinta.');
+                dataInput.value = '';
+                return false;
+            }
+            
+            return true;
         }
 
         // Função principal de cálculo
@@ -1342,6 +1384,14 @@
                 return;
             }
             
+            // Validar dia da semana (apenas Segunda a Quinta)
+            const dataObj = new Date(dataCorrida);
+            const diaSemana = dataObj.getDay();
+            if (diaSemana === 0 || diaSemana === 5 || diaSemana === 6) {
+                mostrarErroModal('ATENÇÃO: Corridas disponíveis apenas de Segunda a Quinta-feira.\n\nPor favor, selecione uma data entre Segunda e Quinta.');
+                return;
+            }
+            
             if (!horarioCorrida) {
                 mostrarErroModal('Por favor, selecione um horário para a corrida.');
                 return;
@@ -1356,7 +1406,7 @@
             // Simular processamento
             setTimeout(() => {
                 try {
-                    // Calcular valores
+                    // Calcular valores (MANTENDO SUA FÓRMULA)
                     const precoPorKm = 2.00;
                     const taxaMinima = 5.00;
                     
@@ -1372,7 +1422,6 @@
                     }
                     
                     // Formatar data para exibição
-                    const dataObj = new Date(dataCorrida);
                     const dataFormatada = dataObj.toLocaleDateString('pt-BR');
                     
                     // Atualizar interface
@@ -1395,7 +1444,7 @@
                     
                     // Atualizar link do WhatsApp no formato solicitado
                     const tipoServicoTexto = isMensal ? "Mensal" : "Avulsa";
-                    const corridasMesTexto = isMensal ? `\n"Corridas no mês": ${corridasPormes}` : '';
+                    const corridasMesTexto = isMensal ? `\n"Corridas no mês": ${corridasPorMes}` : '';
                     
                     const mensagem = `Olá João, gostaria de uma corrida!\n\n` +
                                     `"Origem": ${origem}\n` +
